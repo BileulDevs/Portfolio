@@ -1,0 +1,26 @@
+{
+  "name": "cosmos-portfolio",
+  "private": true,
+  "type": "module",
+  "description": "Portfolio immersif — un voyage spatial cinématique (Nuxt 4 + Three.js + GSAP + Lenis)",
+  "author": "Bilel Sahraoui",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "lenis": "^1.3.0",
+    "nuxt": "^4.2.0",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "typescript": "^5.6.0",
+    "vue-tsc": "^2.1.0"
+  }
+}

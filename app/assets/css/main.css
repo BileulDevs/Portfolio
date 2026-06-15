@@ -1,0 +1,293 @@
+/* =========================================================================
+   COSMOS — design system
+   Palette ancrée dans l'astrophysique réelle :
+   - le « noir » spatial est un indigo très désaturé (pas du #000 plat)
+   - chaud « ember » = poussière stellaire, disque d'accrétion, limbe atmosphérique
+   - froid « plasma » = diffusion de Rayleigh, lecture instrument / HUD
+   ========================================================================= */
+
+:root {
+  /* Fonds */
+  --void: #05070d;
+  --deep: #090d16;
+  --panel: rgba(10, 14, 22, 0.55);
+  --panel-line: rgba(140, 170, 210, 0.16);
+
+  /* Texte (lumière d'étoile, froide) */
+  --text: #d8e2ee;
+  --text-dim: #8b9ab0;
+  --text-faint: #9ea4ad;
+
+  /* Accents */
+  --ember: #f0a062;          /* chaud */
+  --ember-strong: #ff8a4c;
+  --plasma: #76c7ff;         /* froid / HUD */
+  --plasma-soft: #a9dcff;
+
+  /* Typographie */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+
+  /* Échelle */
+  --step--1: clamp(0.78rem, 0.74rem + 0.2vw, 0.9rem);
+  --step-0: clamp(0.95rem, 0.9rem + 0.25vw, 1.08rem);
+  --step-1: clamp(1.2rem, 1.05rem + 0.7vw, 1.6rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.5vw, 2.6rem);
+  --step-3: clamp(2.4rem, 1.8rem + 3vw, 5rem);
+  --step-4: clamp(3.2rem, 2.2rem + 6vw, 8rem);
+
+  --maxw: 1320px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Lenis pilote le scroll ; on garde le scroll natif disponible en secours. */
+  scrollbar-width: none;
+  -webkit-text-size-adjust: 100%;
+}
+html::-webkit-scrollbar { display: none; }
+
+html.lenis,
+html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--ember);
+  color: var(--void);
+}
+
+a {
+  color: var(--plasma-soft);
+  text-decoration: none;
+  transition: color 0.3s var(--ease);
+}
+a:hover { color: #fff; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+}
+
+/* ----------------------------------------------------------------------- */
+/* Couche 3D (canvas) — plein écran, derrière tout, fixe                    */
+/* ----------------------------------------------------------------------- */
+.scene-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none; /* le scroll traverse vers le document */
+}
+.scene-layer canvas { display: block; width: 100%; height: 100%; }
+
+/* ----------------------------------------------------------------------- */
+/* Contenu / scroll — chaque chapitre est volontairement haut : le panneau    */
+/* est centré, laissant de longues plages où seul le 3D est visible (voyage).  */
+/* ----------------------------------------------------------------------- */
+.journey {
+  position: relative;
+  z-index: 2;
+}
+
+.chapter {
+  position: relative;
+  min-height: 175vh; /* ~0.9 écran de 3D au-dessus et en dessous du panneau */
+  display: flex;
+  align-items: center;
+  padding: clamp(1.4rem, 4vw, 5rem);
+}
+/* Chapitres « immersifs » (trou de ver, galaxie) : transition plus longue.
+   La galaxie est volontairement haute : le panneau contact (centré) dégage
+   entièrement avant le bas, laissant la galaxie occuper seule la fin. */
+.chapter--wide { min-height: 260vh; }
+
+/* Contenu ancré en haut de la section :
+   - Terre (1er) : le héros est visible dès l'arrivée, pas centré trop bas
+   - Galaxie (dernier) : le panneau remonte au scroll → la galaxie occupe la fin */
+.chapter--top {
+  align-items: flex-start;
+  padding-top: clamp(4.5rem, 15vh, 12rem);
+}
+
+.chapter__inner {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+}
+
+/* Panneau « verre froid » sobre, pour poser le texte sur le 3D */
+.panel {
+  max-width: 40rem;
+  padding: clamp(1.5rem, 2.5vw, 2.6rem);
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 2px;
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.9);
+  pointer-events: auto;
+}
+.panel--right { margin-left: auto; }
+.panel--center { margin-inline: auto; text-align: center; }
+.panel--lg { max-width: 52rem; }
+
+/* Eyebrow / télémétrie : la couche « lecture instrument » */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--plasma);
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-bottom: 1.4rem;
+}
+.eyebrow::before {
+  content: '';
+  width: 1.6rem;
+  height: 1px;
+  background: var(--plasma);
+  opacity: 0.6;
+}
+
+.lead { color: var(--text-dim); margin-top: 1rem; max-width: 36rem; }
+
+/* Hero (chapitre Terre) */
+.hero-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-4);
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+}
+.hero-role {
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  color: var(--ember);
+  letter-spacing: 0.04em;
+  margin-top: 1rem;
+}
+.hero-slogan {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-2);
+  color: var(--text);
+  margin-top: 1.6rem;
+  max-width: 24ch;
+}
+
+/* Listes de compétences / tags */
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.4rem; }
+.tag {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  padding: 0.32em 0.7em;
+  border: 1px solid var(--panel-line);
+  border-radius: 2px;
+  color: var(--text-dim);
+}
+
+.section-title {
+  font-size: var(--step-2);
+  margin-bottom: 0.4rem;
+}
+
+.meta-row {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+  margin-top: 0.4rem;
+}
+
+/* Cartes (expériences / projets) */
+.cards { display: grid; gap: 1px; margin-top: 1.6rem; background: var(--panel-line); }
+.card { background: var(--deep); padding: 1.3rem 1.4rem; }
+.card h3 { font-size: var(--step-1); }
+.card p { color: var(--text-dim); margin-top: 0.5rem; font-size: var(--step-0); }
+.card .meta-row { margin-top: 0.7rem; }
+
+.metrics { display: flex; flex-wrap: wrap; gap: 1.6rem 2.6rem; margin-top: 1.6rem; }
+.metric .n {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-3);
+  color: var(--ember);
+  line-height: 1;
+}
+.metric .l {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+  display: block;
+  max-width: 18ch;
+}
+
+/* CTA */
+.cta-row { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
+.btn {
+  pointer-events: auto;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.95em 1.5em;
+  border: 1px solid var(--panel-line);
+  border-radius: 2px;
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease), color 0.3s var(--ease), background 0.3s var(--ease);
+}
+.btn:hover { border-color: var(--plasma); color: #fff; }
+.btn--primary { border-color: var(--ember); color: var(--ember); }
+.btn--primary:hover { background: var(--ember); color: var(--void); border-color: var(--ember); }
+
+/* Reveal (animé par GSAP/ScrollTrigger ; valeurs de départ ici) */
+.reveal { opacity: 0; transform: translateY(28px); will-change: transform, opacity; }
+
+/* ----------------------------------------------------------------------- */
+/* Accessibilité — réduction des animations                                 */
+/* ----------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; }
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+:focus-visible {
+  outline: 2px solid var(--plasma);
+  outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .panel { backdrop-filter: blur(10px); max-width: 100%; }
+  .metric .n { font-size: var(--step-2); }
+}
