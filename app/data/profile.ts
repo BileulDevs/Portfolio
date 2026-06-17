@@ -96,6 +96,24 @@ export const projets: Project[] = [
     link: { label: 'CurseForge', url: 'https://www.curseforge.com/members/darcosse/projects' },
   },
   {
+    id: 'whatsinmysky',
+    name: 'WhatsInMySky',
+    tagline: 'Que pouvez-vous observer ce soir ?',
+    stack: ['Javascript', 'Nuxt', 'Three.js'],
+    description:
+      "Application web qui répond à une question simple : que puis-je observer dans le ciel, ici et maintenant ?",
+    link: { label: 'WhatsInMySky', url: 'https://whatsinmysky.netlify.app' },
+  },
+  {
+    id: 'pdfeditor',
+    name: 'PDF Editor',
+    tagline: 'Modifiez un PDF en toute gratuité',
+    stack: ['Javascript', 'Typescript', 'React'],
+    description:
+      "Un éditeur PDF en ligne gratuit, rapide et sans inscription",
+    link: { label: 'PDF Editor', url: 'https://pdfs-editor.netlify.app' },
+  },
+  {
     id: 'rgpd',
     name: 'Plateforme de conformité RGPD',
     tagline: 'Sécurité des données à 4 To',
