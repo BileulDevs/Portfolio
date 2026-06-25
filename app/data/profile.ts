@@ -6,7 +6,7 @@
 export const identity = {
   name: 'Bilel Sahraoui',
   role: 'Développeur Full Stack',
-  stack: 'Node.js · TypeScript · .NET',
+  stack: 'Node.js · TypeScript',
   location: 'Île-de-France, France',
   email: 'bsahraoui.mail@gmail.com',
   phone: '07 68 63 63 15',
