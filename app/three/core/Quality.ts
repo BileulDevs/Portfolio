@@ -28,12 +28,12 @@ export function detectQuality(): QualityProfile {
 
   const profiles: Record<Tier, QualityProfile> = {
     high: {
-      tier: 'high', bloom: true, bloomStrength: 0.9,
+      tier: 'high', bloom: true, bloomStrength: 0.55,
       starCount: 14000, galaxyCount: 28000, nebulaPlanes: 9,
       asteroidCount: 420, sphereSegments: 128, maxPixelRatio: 2,
     },
     medium: {
-      tier: 'medium', bloom: true, bloomStrength: 0.75,
+      tier: 'medium', bloom: true, bloomStrength: 0.35,
       starCount: 8000, galaxyCount: 16000, nebulaPlanes: 6,
       asteroidCount: 240, sphereSegments: 96, maxPixelRatio: 2,
     },
