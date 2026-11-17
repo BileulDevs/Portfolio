@@ -197,7 +197,7 @@ const en = {
       ],
       architecture: {
         summary:
-          "Every module follows the same chain: schema → service → controller → routes → openapi. Zod is the single source of validation and typing; the documentation derives from it.",
+          "Two applications: a Next.js 14 front end and an Express 5 REST API. Only the API reaches the PostgreSQL database (through Prisma) and the outside services: Stripe for billing, object storage for user files, and the moderation queue.",
         decisions: [
           {
             choice: "Zod schemas as the single source of truth",
@@ -258,7 +258,7 @@ const en = {
         "Constellations and space missions (Apollo 11, Rosetta), in French and English",
       ],
       architecture: {
-        summary: "Nuxt pages drive a framework-agnostic WebGL engine through composables. The engine stages one scene at a time with dedicated GLSL materials, fed by sourced data and baked cubemaps.",
+        summary: "Each page asks for one scene: the home observatory, the orrery of a planetary system, a catalogue or a single object. The engine loads that scene, draws it through a post-processing chain, and swaps it when the route changes.",
         decisions: [
           {
             choice: "A WebGL engine with no Vue import",
@@ -319,7 +319,7 @@ const en = {
         "Migration of 50+ business applications to Azure",
       ],
       architecture: {
-        summary: "Node.js, .NET and Vue.js applications deployed to Azure through Azure DevOps, all wired to a shared monitoring layer.",
+        summary: "10+ critical business applications in Node.js, .NET and Vue.js, within an estate of 50+ applications, used every day by 1,500 employees.",
         decisions: [
           {
             choice: "One monitoring layer for the whole estate",
@@ -380,7 +380,7 @@ const en = {
         "Shiny Charm and Scoremons: items and statistics for scoreboards",
       ],
       architecture: {
-        summary: "Multiloader projects: a common module holds the logic, two thin modules plug in Fabric and NeoForge.",
+        summary: "Java projects built with Gradle that add content on top of Cobblemon, itself a Minecraft mod: items, entities, a dimension and spawn data, released for each supported game version on CurseForge and Modrinth.",
         decisions: [
           {
             choice: "Multiloader: a common module, thin loader modules",
@@ -607,7 +607,7 @@ const fr: typeof en = {
       ],
       architecture: {
         summary:
-          "Chaque module suit la même chaîne : schema → service → controller → routes → openapi. Zod est la source unique de validation et de typage, la documentation en découle.",
+          "Deux applications : un front Next.js 14 et une API REST Express 5. Seule l'API accède à la base PostgreSQL (via Prisma) et aux services extérieurs : Stripe pour la facturation, un stockage objet pour les fichiers des utilisateurs, et la file de modération.",
         decisions: [
           {
             choice: "Les schémas Zod comme source de vérité unique",
@@ -668,7 +668,7 @@ const fr: typeof en = {
         "Constellations et missions spatiales (Apollo 11, Rosetta), en français et en anglais",
       ],
       architecture: {
-        summary: "Les pages Nuxt pilotent un moteur WebGL indépendant du framework via des composables. Le moteur met en scène une vue à la fois avec des matériaux GLSL dédiés, nourris par des données sourcées et des cubemaps pré-calculées.",
+        summary: "Chaque page demande une scène : l'observatoire d'accueil, l'orrery d'un système planétaire, un catalogue ou un objet seul. Le moteur charge cette scène, la dessine à travers une chaîne de post-traitement, et la remplace quand la route change.",
         decisions: [
           {
             choice: "Un moteur WebGL sans aucun import de Vue",
@@ -729,7 +729,7 @@ const fr: typeof en = {
         "Migration de 50+ applications métier vers Azure",
       ],
       architecture: {
-        summary: "Des applications Node.js, .NET et Vue.js déployées sur Azure via Azure DevOps, toutes reliées à une brique de monitoring commune.",
+        summary: "Plus de 10 applications métier critiques en Node.js, .NET et Vue.js, au sein d'un parc de 50+ applications, utilisées chaque jour par 1 500 collaborateurs.",
         decisions: [
           {
             choice: "Une seule couche de supervision pour tout le parc",
@@ -790,7 +790,7 @@ const fr: typeof en = {
         "Shiny Charm et Scoremons : objets et statistiques pour scoreboards",
       ],
       architecture: {
-        summary: "Projets multiloader : un module commun porte la logique, deux modules fins branchent Fabric et NeoForge.",
+        summary: "Des projets Java construits avec Gradle qui ajoutent du contenu à Cobblemon, lui-même un mod Minecraft : objets, entités, une dimension et des données d'apparition, publiés pour chaque version du jeu supportée sur CurseForge et Modrinth.",
         decisions: [
           {
             choice: "Multiloader : un module commun, des modules de loader minces",
