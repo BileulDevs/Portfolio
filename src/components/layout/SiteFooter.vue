@@ -1,7 +1,12 @@
+<script setup lang="ts">
+/** Major version of the Nuxt the site is built with, as Nuxt reports it (stays right across upgrades). */
+const nuxtVersion = useNuxtApp().versions.nuxt.split(".")[0];
+</script>
+
 <template>
   <footer class="mono">
     <span>Bilel Sahraoui · {{ new Date().getFullYear() }}</span>
-    <span>{{ $t("footer.made") }}</span>
+    <span>{{ $t("footer.made", { version: nuxtVersion }) }}</span>
   </footer>
 </template>
 

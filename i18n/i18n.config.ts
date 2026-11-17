@@ -102,7 +102,7 @@ const en = {
       subject: "Portfolio contact — {name}",
     },
   },
-  footer: { made: "Vue 3 · Three.js · hand-made WebGL shader" },
+  footer: { made: "Nuxt.js {version} · Three.js" },
   case: {
     role: "Role",
     period: "Period",
@@ -449,7 +449,7 @@ const fr: typeof en = {
       subject: "Contact portfolio — {name}",
     },
   },
-  footer: { made: "Vue 3 · Three.js · shader WebGL fait main" },
+  footer: { made: "Nuxt.js {version} · Three.js" },
   case: {
     role: "Rôle",
     period: "Période",
