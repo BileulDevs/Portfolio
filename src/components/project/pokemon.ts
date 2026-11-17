@@ -63,7 +63,8 @@ export const SPECIES: Record<Companion, Species> = {
     // Alternative eyes for expressions (angry, sad, happy, hurt), on the mother and on the baby.
     hide: /^(kid_)?(eye_angry_|eye_sad_|eyelid_happy_|eyelid_recoil_)/,
     anim: anims("kangaskhan", { cry: "animation.kangaskhan.cry" }),
-    cry: cry("kangaskhan", 0.2),
+    // Its cry (PokeAPI) is about twice as loud as the others: halved to match them.
+    cry: { ...cry("kangaskhan", 0.2), volume: 0.4 },
     speed: 0.8,
   },
   tauros: {
@@ -83,8 +84,12 @@ const SPAWN_S = 0.6;
 const IDLE_S: [number, number] = [1.4, 3.6];
 const TURN = 0.12;
 const BLINK_EVERY: [number, number] = [2.5, 6];
-/** Tries to find a walking target this far from the other Pokémon (in their own sizes). */
-const TARGET_TRIES = 12;
+/** Random spots weighed when choosing where to walk next. */
+const TARGET_TRIES = 16;
+/** Room from the others (in their combined sizes) past which a spot is as good as any. */
+const ROOM_ENOUGH = 1.6;
+/** How much a spot far from where it stands counts, beside room from the others. */
+const AWAY_WEIGHT = 0.6;
 
 const between = ([a, b]: [number, number]) => a + Math.random() * (b - a);
 export interface Area {
@@ -92,6 +97,8 @@ export interface Area {
   maxX: number;
   minZ: number;
   maxZ: number;
+  /** Leftmost x still in view at the front of the area (the canvas's left edge), if known. */
+  viewMinX?: number;
 }
 
 /** One Pokémon roaming the scene. `body` is what to add to the scene and to hit-test. */
@@ -112,6 +119,37 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
   let blinkAt = -1;
   /** Footprint radius (world units), to keep the others at a distance. */
   const radius = Math.max(0.25, (model.height * PX * species.baseScale * SCENE_SCALE) / 2.5);
+  /** How far its body reaches from where it stands, whichever way it faces (world units). */
+  const reach = model.reach * PX * species.baseScale * SCENE_SCALE;
+
+  /**
+   * Where to walk next: of a few random spots, the one with the most room from the others (where they
+   * stand and where they head), favouring spots far from here, so they spread over the whole area
+   * instead of gathering in one place. It stands inside the area, and far enough from the view's left
+   * edge that its body (tail included, whichever way it faces) is never cut there; past the right edge
+   * the canvas goes on under the texts.
+   */
+  function pickTarget(area: Area, others: { position: { x: number; z: number }; target: { x: number; z: number }; radius: number }[]) {
+    const minX = Math.min(area.maxX, Math.max(area.minX, (area.viewMinX ?? -Infinity) + reach)), maxX = area.maxX;
+    const span = Math.hypot(maxX - minX, area.maxZ - area.minZ) || 1;
+    let best = { x: group.position.x, z: group.position.z };
+    let bestScore = -Infinity;
+    for (let i = 0; i < TARGET_TRIES; i++) {
+      const spot = { x: minX + Math.random() * (maxX - minX), z: area.minZ + Math.random() * (area.maxZ - area.minZ) };
+      // Room from the nearest other, in their combined sizes (enough room counts the same for all).
+      const room = others.reduce((least, o) => {
+        const near = Math.min(Math.hypot(spot.x - o.target.x, spot.z - o.target.z), Math.hypot(spot.x - o.position.x, spot.z - o.position.z));
+        return Math.min(least, near / (radius + o.radius));
+      }, ROOM_ENOUGH);
+      const away = Math.hypot(spot.x - group.position.x, spot.z - group.position.z) / span;
+      const score = Math.min(room, ROOM_ENOUGH) + AWAY_WEIGHT * away;
+      if (score > bestScore) {
+        bestScore = score;
+        best = spot;
+      }
+    }
+    return best;
+  }
 
   return {
     body: group,
@@ -150,15 +188,7 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
         state = "idle";
         stateUntil = t + between(IDLE_S);
       } else if (state === "idle" && t >= stateUntil) {
-        // A free spot: not on top of where the others are or are heading.
-        for (let i = 0; i < TARGET_TRIES; i++) {
-          target = { x: area.minX + Math.random() * (area.maxX - area.minX), z: area.minZ + Math.random() * (area.maxZ - area.minZ) };
-          const clear = others.every((o) => {
-            const gap = radius + o.radius;
-            return Math.hypot(target.x - o.target.x, target.z - o.target.z) > gap && Math.hypot(target.x - o.position.x, target.z - o.position.z) > gap;
-          });
-          if (clear) break;
-        }
+        target = pickTarget(area, others);
         state = "walk";
       } else if (state === "walk") {
         const dx = target.x - group.position.x, dz = target.z - group.position.z;

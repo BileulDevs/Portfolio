@@ -185,6 +185,13 @@ export async function loadBedrockModel(urls: { geo: string; animations: string; 
   return {
     /** Lengths of the named animations, in seconds (0 for endless ones). */
     length: (name: string) => compiled.get(name)?.length ?? 0,
+    /** Farthest any cube reaches horizontally from the model's origin at rest, in pixels (tails included). */
+    reach: (() => {
+      const cubes = model.bones.flatMap((b) => b.cubes ?? []);
+      let far = 0;
+      for (const c of cubes) for (const x of [c.origin[0], c.origin[0] + c.size[0]]) for (const z of [c.origin[2], c.origin[2] + c.size[2]]) far = Math.max(far, Math.hypot(x, z));
+      return far;
+    })(),
     /** Height of the model at rest, in pixels (lowest to highest cube). */
     height: (() => {
       const cubes = model.bones.flatMap((b) => b.cubes ?? []);

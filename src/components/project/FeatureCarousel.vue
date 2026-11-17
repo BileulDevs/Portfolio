@@ -467,11 +467,15 @@ onBeforeUnmount(() => {
 /* Detail: the item on the left, the texts beside it (no frame). */
 .detail { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 2fr) 3fr; align-items: center; gap: clamp(16px, 3vw, 40px); }
 .detail .item { width: min(100%, 220px); aspect-ratio: 1; height: auto; justify-self: center; }
-/* The item's little world (an open ball and its Pokémon): wider, so the Pokémon has room to roam. */
-.scene-wrap { position: relative; width: 100%; height: 100%; max-height: 400px; }
-.detail .scene { width: 100%; height: 100%; display: block; }
+/*
+ * The item's little world (an open ball and its Pokémon). Its column frames the scene, but the canvas
+ * spans the whole detail, under the texts: a Pokémon at the column's edge (a tail) is never cut.
+ */
+.scene-wrap { width: 100%; height: 100%; max-height: 400px; }
+.detail .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.text { position: relative; z-index: 1; }
 /* Sound bar, in the scene's bottom corner. */
-.sound { position: absolute; left: 8px; bottom: 8px; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 999px; background: rgba(0, 0, 0, .35); color: #fff; font-family: var(--mono); font-size: 11px; }
+.sound { position: absolute; z-index: 1; left: 8px; bottom: 8px; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 999px; background: rgba(0, 0, 0, .35); color: #fff; font-family: var(--mono); font-size: 11px; }
 .sound .toggle { padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: .04em; cursor: pointer; min-width: 64px; text-align: left; }
 .sound input { width: 90px; accent-color: var(--coral); cursor: pointer; }
 .sound input:disabled { opacity: .4; cursor: default; }
@@ -484,11 +488,13 @@ onBeforeUnmount(() => {
 .back { justify-self: start; margin-top: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; opacity: .7; cursor: pointer; }
 .back:hover { opacity: 1; }
 .detail-enter-active { transition: opacity .45s ease .1s; }
-.detail-enter-active .item, .detail-enter-active .scene-wrap { transition: transform .6s var(--ease) .1s; }
+.detail-enter-active .item, .detail-enter-active .scene-wrap > * { transition: transform .6s var(--ease) .1s; }
 .detail-enter-active .text { transition: transform .6s var(--ease) .15s; }
 .detail-leave-active { transition: opacity .2s ease; }
 .detail-enter-from, .detail-leave-to { opacity: 0; }
-.detail-enter-from .item, .detail-enter-from .scene-wrap { transform: translateX(40%) scale(.85); }
+.detail-enter-from .item, .detail-enter-from .sound { transform: translateX(40%) scale(.85); }
+/* The scene canvas is wider than its column: the same slide, scaled about the column's centre. */
+.detail-enter-from .scene { transform: translateX(16%) scale(.85); transform-origin: 20% 50%; }
 .detail-enter-from .text { transform: translateX(24px); }
 
 /* Under the stage: arrows around the centred feature's name, like the home carousel. */
@@ -508,6 +514,9 @@ onBeforeUnmount(() => {
 @media (max-width: 700px) {
   .open .stage { height: 460px; }
   .detail { grid-template-columns: 1fr; align-content: center; }
+  /* Stacked layout: the scene keeps to its own block above the texts. */
+  .scene-wrap { position: relative; }
+  .detail .scene { position: static; }
   .detail .item { width: 150px; }
 }
 </style>

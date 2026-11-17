@@ -82,9 +82,23 @@ export async function createDetailScene(
   const camera = new T.PerspectiveCamera(30, 1, 0.1, 50 * view);
   let swing = 0;
   let swingTarget = 0;
+  /**
+   * Steps back when the canvas is too narrow to show the whole ground (ball and roaming area, at the
+   * front edge, nearest the camera). Pikachu's own scene already fits, so its framing never changes.
+   */
+  const halfWidth = Math.max(Math.abs(BALL_AT.x * k * crowd) + BALL_PX * PX * Math.max(1, k * BALL_GROWTH), area.maxX, -area.minX);
+  /** The area as the Pokémon see it: with the view's left edge, which their bodies must not cross. */
+  const roamArea: Area = { ...area, viewMinX: -halfWidth };
+  function fitDistance() {
+    const base = CAMERA.distance * view;
+    const tan = Math.tan((camera.fov * Math.PI) / 360);
+    return Math.max(base, halfWidth / (tan * camera.aspect) + (area.maxZ - lookAt.z));
+  }
+  let distance = CAMERA.distance * view;
   function placeCamera() {
-    const d = CAMERA.distance * view;
-    camera.position.set(lookAt.x + Math.sin(swing) * d, CAMERA.height * view, lookAt.z + Math.cos(swing) * d);
+    const d = distance;
+    const lift = (CAMERA.height * view * d) / (CAMERA.distance * view); // same viewing angle at any distance
+    camera.position.set(lookAt.x + Math.sin(swing) * d, lift, lookAt.z + Math.cos(swing) * d);
     camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
   }
   placeCamera();
@@ -129,7 +143,11 @@ export async function createDetailScene(
     const r = canvas.getBoundingClientRect();
     pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(pointer, camera);
-    const hit = ray.intersectObjects(roamers.map((m) => m.body), true)[0];
+    const shown = (o: { visible: boolean; parent: unknown }) => {
+      for (let n = o as { visible: boolean; parent: unknown } | null; n; n = n.parent as typeof n) if (!n.visible) return false;
+      return true;
+    };
+    const hit = ray.intersectObjects(roamers.map((m) => m.body), true).find((h) => shown(h.object));
     return hit ? roamers.find((m) => m.body === hit.object || m.body.getObjectById(hit.object.id)) ?? null : null;
   }
   let drag: { x: number; from: number; moved: boolean } | null = null;
@@ -174,15 +192,30 @@ export async function createDetailScene(
   canvas.dataset.cursorSize = "small"; // a small pill, so the label does not hide the Pokémon
   canvas.style.touchAction = "pan-y";
 
+  /**
+   * The framing is made for the canvas's parent (the scene's own column); the canvas may reach past it
+   * (under the texts), so what sticks out of the column, like a tail, is drawn there instead of cut.
+   * The camera frames the column alone, so the Pokémon roam no farther than before.
+   */
+  const frame = canvas.parentElement ?? canvas;
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+    const fw = frame.clientWidth || w, fh = frame.clientHeight || h;
+    // Layout offsets (not bounding rects, which the opening transition scales).
+    const inside = canvas.offsetParent === frame || frame === canvas;
+    const x = inside ? 0 : canvas.offsetLeft - frame.offsetLeft;
+    const y = inside ? 0 : canvas.offsetTop - frame.offsetTop;
+    camera.aspect = fw / fh;
+    camera.setViewOffset(fw, fh, x, y, w, h);
     camera.updateProjectionMatrix();
+    distance = fitDistance();
+    placeCamera();
   }
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
+  if (frame !== canvas) observer.observe(frame);
   resize();
 
   let start = 0;
@@ -205,7 +238,7 @@ export async function createDetailScene(
       sceneTime = (now - start) / 1000;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      roamers.forEach((m) => m.update(sceneTime, dt, area, roamers.filter((o) => o !== m)));
+      roamers.forEach((m) => m.update(sceneTime, dt, roamArea, roamers.filter((o) => o !== m)));
       const ballOpen = sceneTime >= ballOpensAt && sceneTime < ballShutsAt;
       ball.update(sceneTime, ballOpen ? sceneTime - ballOpensAt : null);
       if (ballOpen && !ballSounded) {
