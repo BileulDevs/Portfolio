@@ -12,3 +12,10 @@ from the same repository; each Pokémon folder carries its model licence as LICE
 Attribution-NonCommercial). safari_ball.png (textures/poke_balls) and sounds/poke_ball_send_out.ogg
 (sounds/poke_ball) come from it too. Chansey, Kangaskhan and Tauros are owned by Nintendo, Game Freak and
 The Pokémon Company.
+
+poipole/ (model, animations, texture) and beast_ball.png (textures/poke_balls) come unmodified from the same
+files, as shipped in the Cobblemon 1.8.4 mod; poipole/ carries its model licence as LICENSE.txt (Creative
+Commons Attribution-NonCommercial). Poipole is owned by Nintendo, Game Freak and The Pokémon Company.
+
+Exceptions: kangaskhan/kangaskhan_cry.ogg and poipole/poipole_cry.ogg come from PokeAPI
+(https://github.com/PokeAPI/cries, 115.ogg and 803.ogg), as Cobblemon's own files are silent placeholders.

@@ -8,7 +8,7 @@ import type { BedrockModel } from "./bedrockModel";
  * Sizes follow Cobblemon: 16 model pixels = 1 block, times the species' `baseScale`, all doubled
  * (SCENE_SCALE) so Pikachu, the first one, reads well beside its ball.
  */
-export type Companion = "pikachu" | "chansey" | "kangaskhan" | "tauros";
+export type Companion = "pikachu" | "chansey" | "kangaskhan" | "tauros" | "poipole";
 
 export interface Species {
   /** Folder under public/projects/cobblemon-mods/cobblemon/, and file names inside it. */
@@ -22,6 +22,11 @@ export interface Species {
   cry?: { sound: string; at: number; volume: number };
   /** Walking speed, in blocks per second; the walk animation plays at real time while walking. */
   speed: number;
+  /**
+   * Flyers (Cobblemon: they cannot walk) hover this many blocks above the ground, bobbing gently.
+   * Cobblemon moves them in code, so their own animations are still poses: the bob keeps them alive.
+   */
+  hover?: number;
 }
 
 /** Every Pokémon is drawn at twice its Cobblemon size (relative sizes stay true). */
@@ -74,6 +79,16 @@ export const SPECIES: Record<Companion, Species> = {
     cry: cry("tauros", 0.3),
     speed: 1,
   },
+  poipole: {
+    files: files("poipole", "poipole", "poipole"),
+    // Cobblemon's is 0.6: drawn as tall as Pikachu instead, so its scene frames like Just Enough Cobblemon's.
+    baseScale: 0.53,
+    anim: anims("poipole"),
+    // Cobblemon's cry is a silent placeholder and it has no cry animation: PokeAPI's cry, standing still.
+    cry: cry("poipole", 0),
+    speed: 0.7,
+    hover: 0.2,
+  },
 };
 
 /** World units per model pixel (Minecraft scale). */
@@ -84,6 +99,11 @@ const SPAWN_S = 0.6;
 const IDLE_S: [number, number] = [1.4, 3.6];
 const TURN = 0.12;
 const BLINK_EVERY: [number, number] = [2.5, 6];
+/** Without a cry animation, it still stops and turns to the camera this long while crying. */
+const STILL_CRY_S = 1;
+/** Flyers' bob: its height as a share of the hover height, and its pace (radians per second). */
+const BOB_SHARE = 0.15;
+const BOB_SPEED = 2.2;
 /** Random spots weighed when choosing where to walk next. */
 const TARGET_TRIES = 16;
 /** Room from the others (in their combined sizes) past which a spot is as good as any. */
@@ -121,6 +141,8 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
   const radius = Math.max(0.25, (model.height * PX * species.baseScale * SCENE_SCALE) / 2.5);
   /** How far its body reaches from where it stands, whichever way it faces (world units). */
   const reach = model.reach * PX * species.baseScale * SCENE_SCALE;
+  /** Height it hovers at, for flyers (world units); 0 for the others. */
+  const lift = (species.hover ?? 0) * SCENE_SCALE;
 
   /**
    * Where to walk next: of a few random spots, the one with the most room from the others (where they
@@ -160,7 +182,7 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
     get target() {
       return target;
     },
-    canCry: () => Boolean(species.anim.cry) && (state === "idle" || state === "walk"),
+    canCry: () => Boolean(species.anim.cry || species.cry) && (state === "idle" || state === "walk"),
     /** Stops, turns to the camera and plays the cry animation; returns the sound to play, if any. */
     cry(t: number) {
       state = "cry";
@@ -179,12 +201,12 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
         const k = Math.min(1, (t - since) / SPAWN_S);
         const ease = 1 - (1 - k) ** 3;
         group.scale.setScalar(0.05 + 0.95 * ease);
-        group.position.set(from.x + (landing.x - from.x) * ease, Math.sin(k * Math.PI) * 0.3, from.z + (landing.z - from.z) * ease);
+        group.position.set(from.x + (landing.x - from.x) * ease, Math.sin(k * Math.PI) * 0.3 + lift * ease, from.z + (landing.z - from.z) * ease);
         if (k >= 1) {
           state = "idle";
           stateUntil = t + between(IDLE_S);
         }
-      } else if (state === "cry" && t - since >= model.length(species.anim.cry ?? "")) {
+      } else if (state === "cry" && t - since >= (model.length(species.anim.cry ?? "") || STILL_CRY_S)) {
         state = "idle";
         stateUntil = t + between(IDLE_S);
       } else if (state === "idle" && t >= stateUntil) {
@@ -205,6 +227,7 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
           heading += Math.atan2(Math.sin(want - heading), Math.cos(want - heading)) * Math.min(1, TURN * dt * 60);
         }
       }
+      if (lift && state !== "spawn") group.position.y = lift * (1 + BOB_SHARE * Math.sin((t - delay) * BOB_SPEED));
       if (state !== "walk") heading += Math.atan2(Math.sin(-heading), Math.cos(-heading)) * Math.min(1, TURN * 0.4 * dt * 60);
       group.rotation.y = heading + MODEL_YAW;
 

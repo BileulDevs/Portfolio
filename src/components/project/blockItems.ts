@@ -134,8 +134,8 @@ async function createBlockMaterials() {
 /** Models taken from Cobblemon (MPL-2.0, credited on the page), in public/projects/cobblemon-mods/cobblemon/. */
 export const COBBLEMON = "/projects/cobblemon-mods/cobblemon/";
 /** Balls: Cobblemon draws them all with the Poké Ball's model and animations, each with its texture. */
-export type BallKind = "poke_ball" | "safari_ball";
-export const BALL_KINDS: readonly BallKind[] = ["poke_ball", "safari_ball"];
+export type BallKind = "poke_ball" | "safari_ball" | "beast_ball";
+export const BALL_KINDS: readonly BallKind[] = ["poke_ball", "safari_ball", "beast_ball"];
 export type ItemKind = BlockKind | BallKind;
 export const isBall = (kind: ItemKind): kind is BallKind => (BALL_KINDS as readonly string[]).includes(kind);
 /** The Poké Ball's height in pixels (8 + its outline), so it can be scaled to a block's size. */
