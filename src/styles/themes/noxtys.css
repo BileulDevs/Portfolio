@@ -53,10 +53,6 @@
 :root .case[data-theme="noxtys"] .facts a { color: var(--coral); }
 :root .case[data-theme="noxtys"] .cols li,
 :root .case[data-theme="noxtys"] .versus { border-top: var(--nx-border); }
-:root .case[data-theme="noxtys"] .arch { background: transparent; padding: 0; }
-:root .case[data-theme="noxtys"] .arch .t { fill: var(--ink); font-family: var(--display); }
-:root .case[data-theme="noxtys"] .arch .node { fill: var(--mist); }
-:root .case[data-theme="noxtys"] .arch .link { stroke: var(--slate); }
 :root .case[data-theme="noxtys"] .nums strong {
   font-family: var(--display); font-weight: 600; letter-spacing: -.03em;
   background: var(--nx-gradient); -webkit-background-clip: text; background-clip: text; color: transparent;

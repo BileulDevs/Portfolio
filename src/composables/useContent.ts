@@ -16,21 +16,7 @@ export function useContent() {
   const copy = computed(() => messages[locale.value as Locale] ?? messages.en);
 
   const projects = computed<Project[]>(() =>
-    projectData.map((p) => {
-      const text = copy.value.projects[p.slug as keyof typeof copy.value.projects];
-      const arch = text.architecture;
-      const labels: Record<string, string> = "labels" in arch ? arch.labels : {};
-      const subs: Record<string, string> = arch.nodes;
-      return {
-        ...p,
-        ...text,
-        architecture: {
-          summary: arch.summary,
-          links: p.architecture.links,
-          nodes: p.architecture.nodes.map((n) => ({ ...n, label: labels[n.id] ?? n.label, sub: subs[n.id] ?? "" })),
-        },
-      };
-    }),
+    projectData.map((p) => ({ ...p, ...copy.value.projects[p.slug as keyof typeof copy.value.projects] })),
   );
 
   const experience = computed<Experience[]>(() =>

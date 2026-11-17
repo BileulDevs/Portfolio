@@ -30,7 +30,6 @@ const en = {
     backToProjects: "Back to projects",
     closeProject: "Close the project",
     quickMessage: "Quick message",
-    architecture: "{name} architecture: {nodes}",
     preview: "Preview of {name}",
   },
   cursor: { go: "Go", write: "Write", view: "View", drag: "Drag" },
@@ -113,7 +112,7 @@ const en = {
     context: "Context",
     goals: "Goals",
     features: "Features",
-    architecture: "Architecture",
+    architecture: "Architecture: key decisions",
     challenges: "Challenges → solutions",
     problem: "Problem",
     solution: "Solution",
@@ -199,7 +198,24 @@ const en = {
       architecture: {
         summary:
           "Every module follows the same chain: schema → service → controller → routes → openapi. Zod is the single source of validation and typing; the documentation derives from it.",
-        nodes: { web: "App Router", api: "modules", zod: "schema · types", db: "Prisma", stripe: "webhooks", r2: "storage" },
+        decisions: [
+          {
+            choice: "Zod schemas as the single source of truth",
+            why: "Request validation, TypeScript types and the OpenAPI documentation all derive from the same schema, so they cannot drift apart.",
+          },
+          {
+            choice: "The same five layers in every module",
+            why: "schema → service → controller → routes → openapi: any module reads the same way, and ownership checks live in one place, the service layer, where they are tested.",
+          },
+          {
+            choice: "Stripe webhooks decide entitlements",
+            why: "Plans, quotas and access follow what Stripe confirms, not what the front end asks for: payments and rights never disagree, even after a mid-period plan change.",
+          },
+          {
+            choice: "Managed services over self-hosting",
+            why: "Railway, PostgreSQL and Cloudflare R2: as the only operator, my time goes into the product rather than servers, and R2 charges nothing for serving user files.",
+          },
+        ],
       },
       challenges: [
         {
@@ -243,7 +259,24 @@ const en = {
       ],
       architecture: {
         summary: "Nuxt pages drive a framework-agnostic WebGL engine through composables. The engine stages one scene at a time with dedicated GLSL materials, fed by sourced data and baked cubemaps.",
-        nodes: { pages: "pages · i18n", bridge: "composables", data: "sourced facts", engine: "render on demand", bake: "baked surfaces", shaders: "19 modules" },
+        decisions: [
+          {
+            choice: "A WebGL engine with no Vue import",
+            why: "The renderer, stages and shaders are plain TypeScript; pages talk to them through two composables. The 3D stays testable and reusable, and Vue reactivity never runs inside the render loop.",
+          },
+          {
+            choice: "Render on demand",
+            why: "A frame is drawn only when something moves: a still page costs no GPU time, which matters on laptops and phones.",
+          },
+          {
+            choice: "Procedural surfaces baked once",
+            why: "Noise fields are computed once into cubemaps, strip by strip, then sampled as textures: the per-frame cost stays low whatever the planet's detail.",
+          },
+          {
+            choice: "Static site, reproducible generated systems",
+            why: "Built with nuxt generate and served by Netlify, no backend. A generated system comes from its seed (gen-<seed>), so any link can be shared and shows the same system.",
+          },
+        ],
       },
       challenges: [
         {
@@ -287,9 +320,24 @@ const en = {
       ],
       architecture: {
         summary: "Node.js, .NET and Vue.js applications deployed to Azure through Azure DevOps, all wired to a shared monitoring layer.",
-        nodes: { devops: "CI/CD", apps: "Node · .NET · Vue", batch: "scheduled at night", mon: "uptime · errors", rgpd: "4 TB encrypted" },
-        /** Node names that differ by language (others come from src/data/projects.ts). */
-        labels: { batch: "Batch jobs", rgpd: "GDPR" },
+        decisions: [
+          {
+            choice: "One monitoring layer for the whole estate",
+            why: "Availability and HTTP errors of 50+ applications watched in one place instead of app by app: incidents surface sooner, detection time halved.",
+          },
+          {
+            choice: "Heavy processing moved to the night",
+            why: "Batch work runs as scheduled night-time jobs: −80% daytime server load and more responsive applications for users.",
+          },
+          {
+            choice: "The same CI/CD path for every application",
+            why: "Node.js, .NET and Vue.js apps all deploy through Azure DevOps pipelines, which made moving 50+ applications to Azure repeatable.",
+          },
+          {
+            choice: "GDPR handled by a dedicated application",
+            why: "Encryption, decryption and purging centralised in one tool rather than spread across apps: one place to audit, applied to 4 TB of data.",
+          },
+        ],
       },
       challenges: [
         {
@@ -333,7 +381,24 @@ const en = {
       ],
       architecture: {
         summary: "Multiloader projects: a common module holds the logic, two thin modules plug in Fabric and NeoForge.",
-        nodes: { json: "config · datapacks", common: "shared logic", fabric: "entrypoints", neo: "entrypoints", cf: "Modrinth" },
+        decisions: [
+          {
+            choice: "Multiloader: a common module, thin loader modules",
+            why: "The game logic is written once; Fabric and NeoForge modules only hold their entry points, so each feature ships on both loaders.",
+          },
+          {
+            choice: "Behaviour configured in JSON",
+            why: "Server owners tune goals and content through config files and datapacks, without a new build: one jar fits very different servers.",
+          },
+          {
+            choice: "The server decides, the client displays",
+            why: "In multiplayer the server stays authoritative and light; clients only receive what they need to draw, such as portal coordinates carried by particles.",
+          },
+          {
+            choice: "Integrate with existing mods rather than rebuild",
+            why: "Spawn data goes into the JEI / EMI recipe viewers players already use, instead of a new interface to learn and maintain.",
+          },
+        ],
       },
       challenges: [
         {
@@ -378,7 +443,6 @@ const fr: typeof en = {
     backToProjects: "Retour aux projets",
     closeProject: "Fermer le projet",
     quickMessage: "Message rapide",
-    architecture: "Architecture de {name} : {nodes}",
     preview: "Aperçu de {name}",
   },
   cursor: { go: "Go", write: "Écrire", view: "Voir", drag: "Glisser" },
@@ -460,7 +524,7 @@ const fr: typeof en = {
     context: "Contexte",
     goals: "Objectifs",
     features: "Fonctionnalités",
-    architecture: "Architecture",
+    architecture: "Architecture : choix structurants",
     challenges: "Difficultés → solutions",
     problem: "Problème",
     solution: "Solution",
@@ -544,7 +608,24 @@ const fr: typeof en = {
       architecture: {
         summary:
           "Chaque module suit la même chaîne : schema → service → controller → routes → openapi. Zod est la source unique de validation et de typage, la documentation en découle.",
-        nodes: { web: "App Router", api: "modules", zod: "schema · types", db: "Prisma", stripe: "webhooks", r2: "stockage" },
+        decisions: [
+          {
+            choice: "Les schémas Zod comme source de vérité unique",
+            why: "Validation des requêtes, types TypeScript et documentation OpenAPI découlent du même schéma : ils ne peuvent pas diverger.",
+          },
+          {
+            choice: "Les mêmes cinq couches dans chaque module",
+            why: "schéma → service → contrôleur → routes → openapi : chaque module se lit de la même façon, et les contrôles de propriété vivent à un seul endroit, la couche service, où ils sont testés.",
+          },
+          {
+            choice: "Les webhooks Stripe décident des droits",
+            why: "Formules, quotas et accès suivent ce que Stripe confirme, pas ce que demande le front : paiements et droits ne divergent jamais, même après un changement de formule en cours de période.",
+          },
+          {
+            choice: "Des services managés plutôt que de l'auto-hébergement",
+            why: "Railway, PostgreSQL et Cloudflare R2 : seul à opérer le produit, je passe mon temps sur le produit plutôt que sur les serveurs, et R2 ne facture pas la diffusion des fichiers.",
+          },
+        ],
       },
       challenges: [
         {
@@ -588,8 +669,24 @@ const fr: typeof en = {
       ],
       architecture: {
         summary: "Les pages Nuxt pilotent un moteur WebGL indépendant du framework via des composables. Le moteur met en scène une vue à la fois avec des matériaux GLSL dédiés, nourris par des données sourcées et des cubemaps pré-calculées.",
-        nodes: { pages: "pages · i18n", bridge: "composables", data: "faits sourcés", engine: "rendu à la demande", bake: "surfaces pré-calculées", shaders: "19 modules" },
-        labels: { data: "Données" },
+        decisions: [
+          {
+            choice: "Un moteur WebGL sans aucun import de Vue",
+            why: "Rendu, scènes et shaders sont en TypeScript pur ; les pages leur parlent via deux composables. La 3D reste testable et réutilisable, et la réactivité de Vue ne tourne jamais dans la boucle de rendu.",
+          },
+          {
+            choice: "Rendu à la demande",
+            why: "Une image n'est dessinée que quand quelque chose bouge : une page immobile ne coûte rien au GPU, ce qui compte sur portable et téléphone.",
+          },
+          {
+            choice: "Surfaces procédurales pré-calculées une fois",
+            why: "Les champs de bruit sont calculés une seule fois dans des cubemaps, bande par bande, puis lus comme des textures : le coût par image reste bas quel que soit le détail de la planète.",
+          },
+          {
+            choice: "Site statique, systèmes générés reproductibles",
+            why: "Construit avec nuxt generate et servi par Netlify, sans backend. Un système généré vient de sa graine (gen-<seed>) : n'importe quel lien se partage et affiche le même système.",
+          },
+        ],
       },
       challenges: [
         {
@@ -633,8 +730,24 @@ const fr: typeof en = {
       ],
       architecture: {
         summary: "Des applications Node.js, .NET et Vue.js déployées sur Azure via Azure DevOps, toutes reliées à une brique de monitoring commune.",
-        nodes: { devops: "CI/CD", apps: "Node · .NET · Vue", batch: "planifiés la nuit", mon: "dispo · erreurs", rgpd: "4 To chiffrés" },
-        labels: { batch: "Batchs", rgpd: "RGPD" },
+        decisions: [
+          {
+            choice: "Une seule couche de supervision pour tout le parc",
+            why: "Disponibilité et erreurs HTTP de 50+ applications surveillées au même endroit plutôt qu'appli par appli : les incidents remontent plus tôt, temps de détection divisé par deux.",
+          },
+          {
+            choice: "Les traitements lourds déplacés la nuit",
+            why: "Les batchs tournent en tâches planifiées la nuit : −80 % de charge serveur en journée et des applications plus réactives pour les utilisateurs.",
+          },
+          {
+            choice: "Le même chemin CI/CD pour toutes les applications",
+            why: "Applis Node.js, .NET et Vue.js déployées par les mêmes pipelines Azure DevOps, ce qui a rendu reproductible la migration de 50+ applications vers Azure.",
+          },
+          {
+            choice: "Le RGPD confié à une application dédiée",
+            why: "Chiffrement, déchiffrement et purge centralisés dans un seul outil plutôt qu'éparpillés dans les applis : un seul endroit à auditer, appliqué à 4 To de données.",
+          },
+        ],
       },
       challenges: [
         {
@@ -678,7 +791,24 @@ const fr: typeof en = {
       ],
       architecture: {
         summary: "Projets multiloader : un module commun porte la logique, deux modules fins branchent Fabric et NeoForge.",
-        nodes: { json: "config · datapacks", common: "logique partagée", fabric: "entrypoints", neo: "entrypoints", cf: "Modrinth" },
+        decisions: [
+          {
+            choice: "Multiloader : un module commun, des modules de loader minces",
+            why: "La logique du jeu est écrite une fois ; les modules Fabric et NeoForge ne contiennent que leurs points d'entrée, chaque fonctionnalité sort donc sur les deux loaders.",
+          },
+          {
+            choice: "Un comportement configuré en JSON",
+            why: "Les admins de serveurs règlent objectifs et contenu via des fichiers de config et des datapacks, sans nouvelle version : un même jar s'adapte à des serveurs très différents.",
+          },
+          {
+            choice: "Le serveur décide, le client affiche",
+            why: "En multijoueur, le serveur reste l'autorité et reste léger ; les clients ne reçoivent que ce qu'il faut pour dessiner, comme les coordonnées d'un portail portées par des particules.",
+          },
+          {
+            choice: "S'intégrer aux mods existants plutôt que tout refaire",
+            why: "Les données d'apparition vont dans JEI / EMI, que les joueurs utilisent déjà, plutôt que dans une nouvelle interface à apprendre et à maintenir.",
+          },
+        ],
       },
       challenges: [
         {

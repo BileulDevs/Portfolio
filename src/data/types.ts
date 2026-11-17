@@ -34,10 +34,10 @@ export interface StackCategory extends StackCategoryData {
   label: string;
 }
 
-export interface ArchitectureNode {
-  id: string;
-  label: string;
-  sub: string;
+/** A structuring technical choice and the reason behind it. */
+export interface Decision {
+  choice: string;
+  why: string;
 }
 
 export interface Challenge {
@@ -59,11 +59,6 @@ export type ProjectTheme = "minecraft" | "noxtys" | "azure";
 export interface ProjectData {
   slug: string;
   stack: string[];
-  /** Diagram structure; each node's caption (`sub`) is translated. */
-  architecture: {
-    nodes: Omit<ArchitectureNode, "sub">[];
-    links: [string, string][];
-  };
   art: ArtStyle;
   theme?: ProjectTheme;
   /** Optional real cover (path under /public). When absent, a generative artwork is painted. */
@@ -75,7 +70,7 @@ export interface ProjectData {
   /** Optional link to the source code, shown beside `url`. */
   repo?: string;
 }
-export interface Project extends Omit<ProjectData, "architecture"> {
+export interface Project extends ProjectData {
   name: string;
   kind: string;
   period: string;
@@ -85,10 +80,10 @@ export interface Project extends Omit<ProjectData, "architecture"> {
   context: string;
   goals: string[];
   features: string[];
+  /** How it is built: a one-paragraph summary, then the structuring choices and their reasons. */
   architecture: {
     summary: string;
-    nodes: ArchitectureNode[];
-    links: [string, string][];
+    decisions: Decision[];
   };
   challenges: Challenge[];
   results: Metric[];

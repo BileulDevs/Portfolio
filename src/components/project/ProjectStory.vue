@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Project } from "@/data/types";
 
-/** Main column of a case study: context → goals → features → architecture → challenges → results. */
+/** Main column of a case study: context → goals → features → architecture decisions → challenges → results. */
 defineProps<{ project: Project }>();
 </script>
 
@@ -21,7 +21,12 @@ defineProps<{ project: Project }>();
 
     <ProjectBlock :title="$t('case.architecture')">
       <p class="lead small">{{ project.architecture.summary }}</p>
-      <div class="arch"><ArchitectureDiagram :project="project" /></div>
+      <ol class="decisions">
+        <li v-for="(d, i) in project.architecture.decisions" :key="d.choice">
+          <span class="num mono">{{ String(i + 1).padStart(2, "0") }}</span>
+          <div><strong>{{ d.choice }}</strong><p>{{ d.why }}</p></div>
+        </li>
+      </ol>
     </ProjectBlock>
 
     <ProjectBlock :title="$t('case.challenges')">
@@ -50,7 +55,11 @@ defineProps<{ project: Project }>();
 .cols li, .versus { padding: 14px 0; border-top: 1px solid rgba(71, 84, 101, .25); font-size: 17px; }
 .versus { padding: 18px 0; }
 .versus b { display: block; font-family: var(--mono); font-weight: 400; font-size: 11px; text-transform: uppercase; color: var(--slate); margin-bottom: 4px; }
-.arch { background: var(--base); border-radius: 8px; padding: 12px; }
+.decisions { margin: 0; padding: 0; list-style: none; }
+.decisions li { display: grid; grid-template-columns: 56px 1fr; gap: 16px; padding: 18px 0; border-top: 1px solid rgba(71, 84, 101, .25); }
+.decisions .num { padding-top: 4px; color: var(--coral); }
+.decisions strong { display: block; font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.decisions p { margin: 6px 0 0; max-width: 62ch; font-size: 16px; line-height: 1.55; opacity: .85; }
 .nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .nums strong { display: block; font-size: clamp(48px, 6vw, 96px); font-weight: 800; letter-spacing: -.06em; line-height: .9; }
 .nums span { font-size: 15px; }

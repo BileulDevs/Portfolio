@@ -8,7 +8,7 @@
 :root .case[data-theme="azure"] {
   --lav: #f3f2f1;    /* neutral canvas; also text on the deep-blue bands */
   --ink: #201f1e;    /* body text (15:1) */
-  --base: #243a5e;   /* deep blue: cover, diagram, "next" band */
+  --base: #243a5e;   /* deep blue: cover, "next" band */
   --slate: #605e5c;  /* secondary text (5.9:1) */
   --mist: #c7e0f4;   /* light blue: secondary text on the deep blue */
   --coral: #0078d4;  /* Azure blue */
@@ -39,7 +39,6 @@
 :root .case[data-theme="azure"] .cols li,
 :root .case[data-theme="azure"] .versus { border-top: 1px solid #edebe9; font-size: 16px; }
 :root .case[data-theme="azure"] .versus b { font-family: var(--display); text-transform: none; font-size: 12px; font-weight: 600; }
-:root .case[data-theme="azure"] .arch { border-radius: 4px; }
 :root .case[data-theme="azure"] .nums strong { font-weight: 600; color: var(--coral); }
 
 :root .case[data-theme="azure"] .next strong { font-weight: 600; }
