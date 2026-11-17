@@ -15,6 +15,10 @@ defineProps<{ project: Project }>();
       <dt>{{ $t("case.link") }}</dt>
       <dd><a :href="project.url" target="_blank" rel="noopener">{{ project.urlLabel ?? project.url }} ↗</a></dd>
     </div>
+    <div v-if="project.repo">
+      <dt>{{ $t("case.repo") }}</dt>
+      <dd><a :href="project.repo" target="_blank" rel="noopener">GitHub ↗</a></dd>
+    </div>
   </dl>
 </template>
 

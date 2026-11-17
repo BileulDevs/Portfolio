@@ -149,7 +149,7 @@ let resizeObserver: ResizeObserver | undefined;
 /** Clock of the animated scenes (shooting stars, office, clouds), in seconds; one uniform shared by all panels. */
 const time = { value: 0 };
 /** Scene id passed to the shader for each artwork (see uScene in FRAG). */
-const SCENES: Record<Project["art"], number> = { night: 1, office: 2, blocks: 3 };
+const SCENES: Record<Project["art"], number> = { night: 1, office: 2, blocks: 3, space: 4 };
 /** When only the scenes move (carousel still), render at this rate instead of the screen's (half the work at 60 Hz). */
 const STARS_FPS = 30;
 /** Half a frame of slack, so 60 Hz screens land on every other frame instead of every third. */
@@ -177,7 +177,7 @@ const FRAG = /* glsl */ `
   uniform float uVel;
   uniform float uHover;
   uniform float uTime;
-  // Animated scene painted on this panel: 1 night sky, 2 office, 3 blocky landscape (0 = still).
+  // Animated scene painted on this panel: 1 night sky, 2 office, 3 blocky landscape, 4 star system (0 = still).
   uniform float uScene;
   varying vec2 vUv;
   varying float vFacing;
@@ -235,6 +235,34 @@ const FRAG = /* glsl */ `
     float m = max(cloud(q, 0.2, 0.12, 5.0, 0.036), max(cloud(q, 0.55, 0.2, 4.0, 0.027), cloud(q, 0.85, 0.07, 3.0, 0.045)));
     return mix(c, vec3(1.0), m * sky * 0.92);
   }
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  // Star system (Observatory): scattered stars twinkling each at its own pace (only on dark sky), and
+  // a small moon orbiting the ringed planet along the ring's tilt, hidden while it passes behind.
+  // p = q in panel units (x × 1.6), so circles stay round; planet values mirror the painter's.
+  vec3 space(vec2 q, vec3 c, vec3 base) {
+    vec2 p = vec2(q.x * 1.6, q.y);
+    float dark = smoothstep(0.22, 0.08, dot(base, vec3(0.299, 0.587, 0.114)));
+    vec2 cell = floor(p * 70.0);
+    // About 1 cell in 100 holds a twinkling star.
+    if (hash(cell) > 0.99) {
+      vec2 star = (cell + 0.5 + (vec2(hash(cell + 3.1), hash(cell + 7.7)) - 0.5) * 0.6) / 70.0;
+      // Each star has its own period (2.5 to 9 s) and phase, from hashes independent of the one that
+      // picked it, and only flashes briefly within its period: the flashes never line up.
+      float period = 2.5 + hash(cell + 11.3) * 6.5;
+      float k = fract(uTime / period + hash(cell + 19.9));
+      float twinkle = smoothstep(0.0, 0.06, k) * smoothstep(0.22, 0.06, k);
+      c += vec3(0.93, 0.94, 1.0) * smoothstep(0.005, 0.0, length(p - star)) * twinkle * dark * 1.5;
+    }
+    vec2 planet = vec2(0.73 * 1.6, 0.5);
+    float a = uTime * 0.4, tilt = -0.28;
+    vec2 o = vec2(cos(a) * 0.4, sin(a) * 0.11);
+    vec2 moon = planet + vec2(o.x * cos(tilt) - o.y * sin(tilt), o.x * sin(tilt) + o.y * cos(tilt));
+    // sin(a) < 0 = the far half of the orbit (upper, as the ring's back half).
+    float hidden = step(sin(a), 0.0) * step(length(p - planet), 0.262);
+    float body = smoothstep(0.022, 0.018, length(p - moon)) * (1.0 - hidden);
+    float lit = clamp(0.35 + dot(normalize(p - moon + 1e-5), vec2(-1.0, 0.0)) * 0.7, 0.15, 1.0);
+    return mix(c, vec3(0.93, 0.93, 1.0) * lit, body);
+  }
   void main() {
     // Chromatic split proportional to speed: the motion cue of the carousel.
     vec2 s = vec2(uVel * 0.035, 0.0);
@@ -248,8 +276,10 @@ const FRAG = /* glsl */ `
       c += vec3(0.93, 0.92, 1.0) * min(m, 1.0);
     } else if (uScene > 1.5 && uScene < 2.5) {
       c = office(q, c);
-    } else if (uScene > 2.5) {
+    } else if (uScene > 2.5 && uScene < 3.5) {
       c = blocks(q, c, base);
+    } else if (uScene > 3.5) {
+      c = space(q, c, base);
     }
     c *= mix(0.45, 1.0, smoothstep(0.55, 1.0, vFacing));
     c += uHover * 0.06;

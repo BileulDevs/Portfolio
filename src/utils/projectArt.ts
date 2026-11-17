@@ -208,6 +208,100 @@ const PAINTERS: Record<ArtStyle, Painter> = {
     roundRect(g, px - 30 * u, deskY - h * 0.08, 60 * u, h * 0.08, 6 * u);
   },
 
+  // Observatory: a star system seen from afar: nebula glow, a star on the left, orbits, and a
+  // banded, ringed planet on the right (clear of the title, bottom-left).
+  space(g, w, h, rnd, o) {
+    const u = w / 1600;
+    const sky = g.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0, "#05070f");
+    sky.addColorStop(0.6, "#0b1124");
+    sky.addColorStop(1, "#141a33");
+    g.fillStyle = sky;
+    g.fillRect(0, 0, w, h);
+    for (const [x, y, r, color] of [[0.3, 0.25, 0.45, "rgba(139,124,246,.2)"], [0.62, 0.12, 0.3, "rgba(255,88,77,.09)"]] as const) {
+      const neb = g.createRadialGradient(w * x, h * y, 0, w * x, h * y, w * r);
+      neb.addColorStop(0, color);
+      neb.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = neb;
+      g.fillRect(0, 0, w, h);
+    }
+    for (let k = 0; k < 480; k++) {
+      const big = rnd() > 0.94;
+      g.fillStyle = `rgba(236,239,249,${0.2 + rnd() * 0.8})`;
+      g.beginPath();
+      g.arc(rnd() * w, rnd() * h, (big ? 1.5 + rnd() * 1.4 : 0.5 + rnd() * 0.8) * u, 0, Math.PI * 2);
+      g.fill();
+    }
+
+    // The star, half off-canvas on the left, and the orbits around it.
+    const sx = -w * 0.04, sy = h * 0.5;
+    const sun = g.createRadialGradient(sx, sy, 0, sx, sy, w * 0.32);
+    sun.addColorStop(0, "rgba(255,236,200,1)");
+    sun.addColorStop(0.18, "rgba(255,196,130,.75)");
+    sun.addColorStop(1, "rgba(255,150,90,0)");
+    g.fillStyle = sun;
+    g.fillRect(0, 0, w, h);
+    g.lineWidth = 1.3 * u;
+    for (const [rx, t] of [[0.34, 1.1], [0.55, 0.35], [0.8, 0.62]] as const) {
+      g.strokeStyle = "rgba(182,205,232,.2)";
+      g.beginPath();
+      g.ellipse(sx, sy, w * rx, w * rx * 0.3, -0.1, 0, Math.PI * 2);
+      g.stroke();
+      // A small planet on each orbit.
+      const px = sx + Math.cos(t) * w * rx * Math.cos(-0.1) - Math.sin(t) * w * rx * 0.3 * Math.sin(-0.1);
+      const py = sy + Math.cos(t) * w * rx * Math.sin(-0.1) + Math.sin(t) * w * rx * 0.3 * Math.cos(-0.1);
+      g.fillStyle = PALETTE.mist;
+      g.beginPath();
+      g.arc(px, py, (5 + rnd() * 5) * u, 0, Math.PI * 2);
+      g.fill();
+    }
+
+    // The ringed planet: back half of the ring, banded body lit from the star's side, front half.
+    const cx = w * 0.73, cy = h * 0.5, r = h * 0.26, tilt = -0.28;
+    const ring = (from: number, to: number) => {
+      for (const [k, color] of [[2.25, "rgba(255,88,77,.55)"], [1.95, "rgba(238,237,255,.45)"], [1.7, "rgba(182,205,232,.35)"]] as const) {
+        g.strokeStyle = color;
+        g.lineWidth = r * 0.12;
+        g.beginPath();
+        g.ellipse(cx, cy, r * k, r * k * 0.24, tilt, from, to);
+        g.stroke();
+      }
+    };
+    ring(Math.PI, Math.PI * 2);
+    g.save();
+    g.beginPath();
+    g.arc(cx, cy, r, 0, Math.PI * 2);
+    g.clip();
+    g.fillStyle = "#7f98c2";
+    g.fillRect(cx - r, cy - r, r * 2, r * 2);
+    const BANDS = ["#b6cde8", "#556c96", "#9db3d6", "#475465", "#c7d6ec"];
+    for (let y = cy - r; y < cy + r; y += r * (0.1 + rnd() * 0.12)) {
+      g.fillStyle = BANDS[Math.floor(rnd() * BANDS.length)];
+      g.globalAlpha = 0.35 + rnd() * 0.35;
+      g.fillRect(cx - r, y, r * 2, r * (0.04 + rnd() * 0.08));
+    }
+    g.globalAlpha = 1;
+    const shade = g.createLinearGradient(cx - r, cy - r * 0.4, cx + r, cy + r * 0.4);
+    shade.addColorStop(0, "rgba(5,7,15,0)");
+    shade.addColorStop(0.55, "rgba(5,7,15,.35)");
+    shade.addColorStop(1, "rgba(5,7,15,.9)");
+    g.fillStyle = shade;
+    g.fillRect(cx - r, cy - r, r * 2, r * 2);
+    g.restore();
+    g.strokeStyle = "rgba(182,205,232,.4)";
+    g.lineWidth = 2 * u;
+    g.beginPath();
+    g.arc(cx, cy, r, Math.PI * 0.55, Math.PI * 1.45);
+    g.stroke();
+    ring(0, Math.PI);
+
+    // Still shooting stars on covers; on carousel panels the shader draws moving ones instead.
+    if (!o.live) {
+      shootingStar(g, w * 0.5, h * 0.2, w * 0.18, 0.42, 2.4 * u);
+      shootingStar(g, w * 0.9, h * 0.1, w * 0.08, 0.42, 1.6 * u);
+    }
+  },
+
   // Minecraft mods: a blocky landscape: sky, square sun, block clouds, grass / dirt / stone, a tree.
   blocks(g, w, h, rnd, o) {
     // On covers the sky (and its clouds) is a CSS layer behind the picture.

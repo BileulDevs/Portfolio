@@ -26,6 +26,25 @@ export const projects: ProjectData[] = [
     urlLabel: "noxtys.com",
   },
   {
+    slug: "observatory",
+    stack: ["Nuxt 4", "Vue 3", "TypeScript", "Three.js", "GLSL", "@nuxtjs/i18n", "Netlify"],
+    architecture: {
+      nodes: [
+        { id: "pages", label: "Nuxt 4" },
+        { id: "bridge", label: "useStage" },
+        { id: "data", label: "Data" },
+        { id: "engine", label: "Engine" },
+        { id: "bake", label: "CubeBaker" },
+        { id: "shaders", label: "GLSL" },
+      ],
+      links: [["pages", "bridge"], ["bridge", "engine"], ["data", "engine"], ["bake", "engine"], ["engine", "shaders"]],
+    },
+    art: "space",
+    url: "https://space-observatory.netlify.app/",
+    urlLabel: "space-observatory.netlify.app",
+    repo: "https://github.com/BileulDevs/observatory",
+  },
+  {
     slug: "athlon",
     stack: ["Node.js", "C# / .NET", "Vue.js", "Azure", "Azure DevOps", "CI/CD", "Winston"],
     architecture: {

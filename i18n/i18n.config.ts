@@ -109,6 +109,7 @@ const en = {
     status: "Status",
     stack: "Stack",
     link: "Link",
+    repo: "Source code",
     context: "Context",
     goals: "Goals",
     features: "Features",
@@ -218,6 +219,50 @@ const en = {
         { value: "Solo", label: "from architecture to production" },
         { value: "5", label: "layers per module, always the same" },
         { value: "1", label: "source of truth: the Zod schemas" },
+      ],
+    },
+    observatory: {
+      name: "Observatory",
+      kind: "Interactive 3D · WebGL",
+      period: "Nov. 2026",
+      status: "Personal project, live",
+      tagline: "Real planetary systems and procedural planets, rendered live in the browser.",
+      role: "Solo: design, 3D engine, shaders and content",
+      context:
+        "A showcase site about space: a procedural planet you can art-direct, real planetary systems (the Solar System, TRAPPIST-1, Kepler-90, Proxima Centauri, HR 8799) and generated ones, a catalogue of objects, constellations and famous missions.",
+      goals: [
+        "Render planets and deep-sky objects in real time, on desktop and on phones",
+        "Stay true to the data: real orbits and facts, each with its source",
+        "Keep the 3D engine independent from the UI framework",
+      ],
+      features: [
+        "Planet creator: classes, palettes and art styles to blend",
+        "5 real planetary systems, plus reproducible generated ones",
+        "Object catalogue: a black hole with gravitational lensing, nebulae, galaxies, comets, NASA spacecraft models",
+        "Constellations and space missions (Apollo 11, Rosetta), in French and English",
+      ],
+      architecture: {
+        summary: "Nuxt pages drive a framework-agnostic WebGL engine through composables. The engine stages one scene at a time with dedicated GLSL materials, fed by sourced data and baked cubemaps.",
+        nodes: { pages: "pages · i18n", bridge: "composables", data: "sourced facts", engine: "render on demand", bake: "baked surfaces", shaders: "19 modules" },
+      },
+      challenges: [
+        {
+          problem: "Procedural planet surfaces are too expensive to compute every frame, especially on phones.",
+          solution: "Fields baked once into cubemaps, strip by strip, at a resolution chosen for the device.",
+        },
+        {
+          problem: "One site for high-end desktops and modest phones.",
+          solution: "Three GPU quality tiers (bake size, pixel ratio, MSAA, ray-march steps) decided in one place, and a render loop that only draws when something moves.",
+        },
+        {
+          problem: "Real sizes and distances cannot fit on one screen.",
+          solution: "A real-to-display scale that compresses sizes, orbits and periods while keeping their order.",
+        },
+      ],
+      results: [
+        { value: "5", label: "real planetary systems" },
+        { value: "19", label: "GLSL shader modules" },
+        { value: "3", label: "GPU quality tiers" },
       ],
     },
     athlon: {
@@ -411,6 +456,7 @@ const fr: typeof en = {
     status: "Statut",
     stack: "Stack",
     link: "Lien",
+    repo: "Code source",
     context: "Contexte",
     goals: "Objectifs",
     features: "Fonctionnalités",
@@ -518,6 +564,51 @@ const fr: typeof en = {
         { value: "Solo", label: "de l'architecture à la production" },
         { value: "5", label: "couches par module, toujours les mêmes" },
         { value: "1", label: "source de vérité : les schémas Zod" },
+      ],
+    },
+    observatory: {
+      name: "Observatory",
+      kind: "3D interactive · WebGL",
+      period: "Nov. 2026",
+      status: "Projet perso, en ligne",
+      tagline: "Des systèmes planétaires réels et des planètes procédurales, rendus en direct dans le navigateur.",
+      role: "Seul : conception, moteur 3D, shaders et contenu",
+      context:
+        "Un site vitrine sur l'espace : une planète procédurale que l'on peut mettre en scène, des systèmes planétaires réels (le Système solaire, TRAPPIST-1, Kepler-90, Proxima du Centaure, HR 8799) et générés, un catalogue d'objets, des constellations et des missions célèbres.",
+      goals: [
+        "Rendre planètes et objets du ciel profond en temps réel, sur ordinateur comme sur téléphone",
+        "Rester fidèle aux données : orbites et faits réels, chacun avec sa source",
+        "Garder le moteur 3D indépendant du framework d'interface",
+      ],
+      features: [
+        "Créateur de planètes : classes, palettes et styles artistiques à mélanger",
+        "5 systèmes planétaires réels, plus des systèmes générés reproductibles",
+        "Catalogue d'objets : trou noir avec lentille gravitationnelle, nébuleuses, galaxies, comètes, maquettes de sondes NASA",
+        "Constellations et missions spatiales (Apollo 11, Rosetta), en français et en anglais",
+      ],
+      architecture: {
+        summary: "Les pages Nuxt pilotent un moteur WebGL indépendant du framework via des composables. Le moteur met en scène une vue à la fois avec des matériaux GLSL dédiés, nourris par des données sourcées et des cubemaps pré-calculées.",
+        nodes: { pages: "pages · i18n", bridge: "composables", data: "faits sourcés", engine: "rendu à la demande", bake: "surfaces pré-calculées", shaders: "19 modules" },
+        labels: { data: "Données" },
+      },
+      challenges: [
+        {
+          problem: "Les surfaces de planètes procédurales coûtent trop cher à calculer à chaque image, surtout sur téléphone.",
+          solution: "Champs pré-calculés une fois dans des cubemaps, bande par bande, à une résolution choisie selon l'appareil.",
+        },
+        {
+          problem: "Un même site pour des ordinateurs puissants et des téléphones modestes.",
+          solution: "Trois niveaux de qualité GPU (taille du pré-calcul, densité de pixels, MSAA, pas de ray-marching) décidés à un seul endroit, et une boucle de rendu qui ne dessine que quand quelque chose bouge.",
+        },
+        {
+          problem: "Les tailles et distances réelles ne tiennent pas sur un écran.",
+          solution: "Une échelle réel → affichage qui compresse tailles, orbites et périodes en gardant leur ordre.",
+        },
+      ],
+      results: [
+        { value: "5", label: "systèmes planétaires réels" },
+        { value: "19", label: "modules de shaders GLSL" },
+        { value: "3", label: "niveaux de qualité GPU" },
       ],
     },
     athlon: {
