@@ -129,6 +129,7 @@ function locate(slug: string) {
   target = pos = base + delta;
   velocity = 0;
   cancelAnimationFrame(raf);
+  starsOnly = false; // this frame must not be skipped: it places the panels that are measured next
   frame(); // places the panels for the new position (centreRect then renders and measures them)
   return centreRect();
 }
@@ -145,6 +146,17 @@ let camera: import("three").PerspectiveCamera | null = null;
 let meshes: { mesh: import("three").Mesh; mat: import("three").ShaderMaterial; slot: number }[] = [];
 let textures: import("./threeParts").Texture[] = [];
 let resizeObserver: ResizeObserver | undefined;
+/** Clock of the animated scenes (shooting stars, office, clouds), in seconds; one uniform shared by all panels. */
+const time = { value: 0 };
+/** Scene id passed to the shader for each artwork (see uScene in FRAG). */
+const SCENES: Record<Project["art"], number> = { night: 1, office: 2, blocks: 3 };
+/** When only the scenes move (carousel still), render at this rate instead of the screen's (half the work at 60 Hz). */
+const STARS_FPS = 30;
+/** Half a frame of slack, so 60 Hz screens land on every other frame instead of every third. */
+const STARS_SLACK_MS = 4;
+/** Settled, with only the scenes animating: frames in between are skipped. Cleared by wake(). */
+let starsOnly = false;
+let lastRender = 0;
 
 const VERT = /* glsl */ `
   uniform float uX;
@@ -164,6 +176,9 @@ const FRAG = /* glsl */ `
   uniform sampler2D uTex;
   uniform float uVel;
   uniform float uHover;
+  uniform float uTime;
+  // Animated scene painted on this panel: 1 night sky, 2 office, 3 blocky landscape (0 = still).
+  uniform float uScene;
   varying vec2 vUv;
   varying float vFacing;
   float roundedMask(vec2 uv) {
@@ -171,10 +186,71 @@ const FRAG = /* glsl */ `
     vec2 q = abs(uv - 0.5) * vec2(1.6, 1.0) - vec2(0.8, 0.5) + 0.018;
     return 1.0 - smoothstep(0.0, 0.004, length(max(q, 0.0)) - 0.018);
   }
+  // A shooting star crossing the panel's sky. p is in panel units (x × 1.6, height = 1, y up);
+  // it flies from start for the first 22% of its period, then rests until the next pass.
+  float meteor(vec2 p, vec2 start, float period, float offset) {
+    float k = fract((uTime + offset) / period);
+    if (k > 0.22) return 0.0;
+    float t = k / 0.22;
+    vec2 dir = normalize(vec2(-0.91, -0.42));
+    vec2 head = start + dir * t * 0.6;
+    vec2 tail = head - dir * 0.24;
+    vec2 pa = p - tail, ba = head - tail;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    float dist = length(pa - ba * h);
+    // Thin bright core and a soft halo, both fading toward the tail; in and out over the flight.
+    float trail = (smoothstep(0.0035, 0.0, dist) + 0.35 * smoothstep(0.012, 0.0, dist)) * h * h;
+    float head_ = smoothstep(0.012, 0.0, length(p - head)) * 0.8;
+    return (trail + head_) * smoothstep(0.0, 0.12, t) * smoothstep(1.0, 0.75, t);
+  }
+  // The scenes below use q = position as the painter draws it: x and y from the top-left, 0 to 1.
+  // Office: a refresh line sweeping the monitor's dashboard, and steam rising from the mug.
+  vec3 office(vec2 q, vec3 c) {
+    float screen = step(0.44, q.x) * step(q.x, 0.82) * step(0.156, q.y) * step(q.y, 0.544);
+    float sweep = 0.41 + fract(uTime / 3.5) * 0.44;
+    c += vec3(0.72, 0.8, 0.91) * screen * smoothstep(0.035, 0.0, abs(q.x - sweep)) * 0.16;
+    for (int i = 0; i < 2; i++) {
+      float f = float(i);
+      float life = fract(uTime / 2.6 + f * 0.5);
+      float y = 0.70 - life * 0.15;
+      float x = 0.862 + f * 0.008 + sin(q.y * 45.0 + uTime * 2.0 + f * 3.0) * 0.005;
+      // Soft and wide enough to read at the panel's on-screen size (a few pixels across).
+      float body = smoothstep(0.014, 0.0, abs(q.x - x) * 1.6) * smoothstep(0.05, 0.0, abs(q.y - y));
+      c += vec3(1.0) * body * step(q.y, 0.705) * (1.0 - life) * 0.45;
+    }
+    return c;
+  }
+  // Block cloud (two rectangles, like the painter's) drifting right; wraps around off-screen.
+  float cloud(vec2 q, float start, float y, float n, float speed) {
+    float S = 1.0 / 32.0, Sy = 1.6 / 32.0;
+    float x = fract(start + uTime * speed) * 1.4 - 0.2;
+    vec2 a = step(vec2(x, y), q) * step(q, vec2(x + S * n, y + Sy * 0.8));
+    vec2 b = step(vec2(x + S, y - Sy * 0.6), q) * step(q, vec2(x + S * (n - 1.0), y + Sy * 0.1));
+    return max(a.x * a.y, b.x * b.y);
+  }
+  // Blocky landscape: clouds drift across the sky, only where the picture shows sky (clearly blue
+  // pixels), so they pass behind the sun, the tree and the terrain.
+  vec3 blocks(vec2 q, vec3 c, vec3 base) {
+    float sky = smoothstep(0.08, 0.16, base.b - base.r);
+    float m = max(cloud(q, 0.2, 0.12, 5.0, 0.012), max(cloud(q, 0.55, 0.2, 4.0, 0.009), cloud(q, 0.85, 0.07, 3.0, 0.015)));
+    return mix(c, vec3(1.0), m * sky * 0.92);
+  }
   void main() {
     // Chromatic split proportional to speed: the motion cue of the carousel.
     vec2 s = vec2(uVel * 0.035, 0.0);
-    vec3 c = vec3(texture2D(uTex, vUv + s).r, texture2D(uTex, vUv).g, texture2D(uTex, vUv - s).b);
+    vec3 base = texture2D(uTex, vUv).rgb;
+    vec3 c = vec3(texture2D(uTex, vUv + s).r, base.g, texture2D(uTex, vUv - s).b);
+    vec2 q = vec2(vUv.x, 1.0 - vUv.y);
+    if (uScene > 0.5 && uScene < 1.5) {
+      // Night sky (Noxtys): three shooting stars with staggered timing.
+      vec2 p = vec2(vUv.x * 1.6, vUv.y);
+      float m = meteor(p, vec2(1.35, 0.92), 5.0, 0.0) + meteor(p, vec2(1.0, 0.98), 7.0, 2.6) + meteor(p, vec2(1.55, 0.78), 9.0, 5.1);
+      c += vec3(0.93, 0.92, 1.0) * min(m, 1.0);
+    } else if (uScene > 1.5 && uScene < 2.5) {
+      c = office(q, c);
+    } else if (uScene > 2.5) {
+      c = blocks(q, c, base);
+    }
     c *= mix(0.45, 1.0, smoothstep(0.55, 1.0, vFacing));
     c += uHover * 0.06;
     float a = roundedMask(vUv) * smoothstep(-0.1, 0.45, vFacing);
@@ -222,7 +298,15 @@ async function initWebGL() {
       vertexShader: VERT,
       fragmentShader: FRAG,
       transparent: true,
-      uniforms: { uTex: { value: textures[slot % count.value] }, uX: { value: 0 }, uR: { value: REST_RADIUS }, uVel: { value: 0 }, uHover: { value: 0 } },
+      uniforms: {
+        uTex: { value: textures[slot % count.value] },
+        uX: { value: 0 },
+        uR: { value: REST_RADIUS },
+        uVel: { value: 0 },
+        uHover: { value: 0 },
+        uTime: time, // shared by every panel
+        uScene: { value: SCENES[props.projects[slot % count.value].art] },
+      },
     });
     const mesh = new T.Mesh(geo, mat);
     // Vertices are moved in the shader, so the CPU bounding sphere is meaningless.
@@ -261,11 +345,20 @@ let hovering = false;
 function frame() {
   raf = 0;
   if (!renderer || !scene || !camera) return;
+  const now = performance.now();
+  if (starsOnly && now - lastRender < 1000 / STARS_FPS - STARS_SLACK_MS) {
+    if (inView.value) raf = requestAnimationFrame(frame);
+    return;
+  }
+  lastRender = now;
   const prev = pos;
   pos += (target - pos) * EASE;
   velocity += (pos - prev - velocity) * 0.25;
   const radius = Math.max(MIN_RADIUS, REST_RADIUS - Math.abs(velocity) * BEND_PER_SPEED);
   const total = meshes.length;
+  time.value = now / 1000;
+  /** A panel with an animated scene is on screen: keep rendering even when nothing else moves. */
+  let animated = false;
   for (const { mat, slot } of meshes) {
     // Signed distance of this slot from the centre, wrapped around the ring.
     let d = (slot - pos) % total;
@@ -275,16 +368,20 @@ function frame() {
     mat.uniforms.uR.value = radius;
     mat.uniforms.uVel.value = velocity;
     mat.uniforms.uHover.value = hovering && Math.abs(d) < 0.5 ? 1 : 0;
+    if (mat.uniforms.uScene.value && Math.abs(d) < 1.5) animated = true;
   }
   renderer.render(scene, camera);
   const idx = wrapIndex(pos);
   if (idx !== active.value) active.value = idx;
   arc.value = arcAt(pos);
   const settled = Math.abs(target - pos) < 0.0005 && Math.abs(velocity) < 0.00005 && !drag;
-  // Idle when settled or off-screen: zero per-frame cost while nothing moves.
-  if (!settled && inView.value) raf = requestAnimationFrame(frame);
+  // Idle when settled (and no shooting stars on screen) or off-screen: no per-frame cost while nothing moves.
+  starsOnly = settled && animated;
+  if ((!settled || animated) && inView.value) raf = requestAnimationFrame(frame);
 }
 function wake() {
+  // Something moved (input, resize, hover): back to full rate from the very next frame.
+  starsOnly = false;
   if (!raf && mode.value === "webgl" && renderer) raf = requestAnimationFrame(frame);
 }
 watch(inView, (v) => v && wake());
@@ -315,9 +412,12 @@ function onMove(e: PointerEvent) {
   if (mode.value !== "webgl") return;
   if (!drag) {
     const centred = Math.abs(relX(e.clientX)) < 0.5;
-    hovering = centred;
     stage.value!.dataset.cursor = centred ? t("cursor.view") : t("cursor.drag");
-    wake();
+    // Only a change of hover state needs a new frame; plain mouse moves leave the rate alone.
+    if (centred !== hovering) {
+      hovering = centred;
+      wake();
+    }
     return;
   }
   const dx = e.clientX - drag.x;

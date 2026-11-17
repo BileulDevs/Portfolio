@@ -71,7 +71,7 @@ Conventions :
 
 1. Ajouter un objet dans `src/data/projects.ts` (le `slug` devient l'URL), puis ses textes sous `projects.<slug>` dans les deux langues de `i18n/i18n.config.ts`.
 2. Optionnel : déposer des images dans `public/projects/<slug>/` et renseigner `cover` et `gallery`.
-   Sans `cover`, un visuel est généré selon `art` (`rings`, `voxels`, `monitor`).
+   Sans `cover`, un visuel est généré selon `art` (`night` ciel étoilé, `office` bureau, `blocks` paysage en blocs).
 
 Le carrousel, la page projet, la navigation précédent / suivant et le titre de l'onglet suivent automatiquement.
 

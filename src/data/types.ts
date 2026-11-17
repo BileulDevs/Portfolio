@@ -50,8 +50,8 @@ export interface Metric {
   label: string;
 }
 
-/** Visual identity of a project's generated artwork (used until real screenshots exist). */
-export type ArtStyle = "rings" | "voxels" | "monitor";
+/** Scene painted as a project's artwork (carousel panel, cover) until real screenshots exist. */
+export type ArtStyle = "night" | "office" | "blocks";
 
 /** Visual theme of a case study (styles in src/styles/themes/). Absent = the site's own look. */
 export type ProjectTheme = "minecraft" | "noxtys" | "azure";
