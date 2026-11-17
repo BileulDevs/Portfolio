@@ -43,9 +43,11 @@ const go = (slug: string) => navigateTo(props.linkTo(slug), { replace: props.rep
     <Transition name="case" @after-leave="onLeft">
       <div v-if="visible">
         <ProjectHero :project="project" :number="pad(shown + 1)" :total="pad(projects.length)" />
-        <ProjectCover :project="project" :index="shown" />
-        <div class="body">
+        <div class="showcase">
+          <ProjectCover :project="project" :index="shown" />
           <ProjectFacts :project="project" />
+        </div>
+        <div class="body">
           <ProjectStory :project="project" />
         </div>
         <ProjectNext :project="next" :to="linkTo(next.slug)" :replace="replace" />
@@ -57,12 +59,23 @@ const go = (slug: string) => navigateTo(props.linkTo(slug), { replace: props.rep
 
 <style scoped>
 .case { background: var(--lav); color: var(--ink); min-height: 100svh; padding-bottom: 120px; }
-.body { display: grid; grid-template-columns: 280px 1fr; gap: clamp(28px, 5vw, 80px); padding: clamp(48px, 8vh, 96px) var(--pad); }
+/* Content column capped at --case-w on wide screens: the side padding grows instead (the dock keeps the page edges). */
+.case > div { --case-w: 1200px; --pad: max(clamp(18px, 4vw, 64px), calc((100% - var(--case-w)) / 2)); }
+/* The animated cover and the key facts side by side, same height. */
+.showcase { display: grid; grid-template-columns: 1fr 260px; gap: 16px; padding: 0 var(--pad); }
+/* Wide: the cover fills the row, as tall as the facts (never shorter than 340px). */
+.showcase > :deep(.cover) { margin: 0; aspect-ratio: auto; min-height: 340px; }
+/* Site look (no theme, e.g. Observatory): the facts sit on a raised card beside the cover. */
+.case:not([data-theme]) .showcase > :deep(.facts) {
+  padding: 20px 22px; border-radius: 8px; background: var(--lav);
+  box-shadow: 0 1px 2px rgba(31, 38, 48, .06), 0 10px 30px -8px rgba(31, 38, 48, .18);
+}
+@media (max-width: 900px) { .showcase { grid-template-columns: 1fr; } .showcase > :deep(.cover) { aspect-ratio: 16 / 10; min-height: 0; } }
+.body { padding: clamp(40px, 6vh, 72px) var(--pad); }
 /* Switching project: the old one fades out, the new one fades in (the dock stays put). */
 .case-leave-active { transition: opacity .25s ease; }
 .case-enter-active { transition: opacity .6s ease, transform .6s var(--ease); }
 .case-leave-to, .case-enter-from { opacity: 0; }
 .case-enter-from { transform: translateY(16px); }
 @media (prefers-reduced-motion: reduce) { .case-enter-active, .case-leave-active { transition: none; } .case-enter-from { transform: none; } }
-@media (max-width: 900px) { .body { grid-template-columns: 1fr; } }
 </style>

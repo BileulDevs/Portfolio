@@ -41,17 +41,19 @@
 :root .case[data-theme="noxtys"] .hero h1 { font-family: var(--display); font-weight: 600; letter-spacing: -.03em; line-height: .95; }
 :root .case[data-theme="noxtys"] .hero .tagline { font-weight: 400; color: var(--slate); letter-spacing: -.01em; }
 
-:root .case[data-theme="noxtys"] .cover { border-radius: 18px; border: var(--nx-border); }
+:root .case[data-theme="noxtys"] .cover { border-radius: 10px; border: var(--nx-border); }
 
 /* Glass cards. */
 :root .case[data-theme="noxtys"] .facts,
 :root .case[data-theme="noxtys"] .block {
-  background: var(--nx-surface); border: var(--nx-border); border-radius: 18px; padding: 22px 26px;
+  background: var(--nx-surface); border: var(--nx-border); border-radius: 10px; padding: 18px 22px;
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
 }
 :root .case[data-theme="noxtys"] .block + .block { margin-top: 16px; }
+:root .case[data-theme="noxtys"] .pair { margin-bottom: 16px; }
+:root .case[data-theme="noxtys"] .pair > .block { margin-top: 0; }
 :root .case[data-theme="noxtys"] .facts a { color: var(--coral); }
-:root .case[data-theme="noxtys"] .cols li,
+:root .case[data-theme="noxtys"] .cols li, :root .case[data-theme="noxtys"] .stack li,
 :root .case[data-theme="noxtys"] .versus { border-top: var(--nx-border); }
 :root .case[data-theme="noxtys"] .nums strong {
   font-family: var(--display); font-weight: 600; letter-spacing: -.03em;

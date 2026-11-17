@@ -13,8 +13,8 @@ defineProps<{ project: Project; number: string; total: string }>();
 </template>
 
 <style scoped>
-.hero { padding: clamp(110px, 16vh, 170px) var(--pad) 40px; }
+.hero { padding: clamp(96px, 13vh, 140px) var(--pad) 32px; }
 .mono { color: var(--slate); margin: 0; }
-h1 { margin: 12px 0 0; font-size: clamp(60px, 12vw, 210px); font-weight: 800; letter-spacing: -.07em; line-height: .84; }
-.tagline { font-size: clamp(22px, 2.6vw, 38px); line-height: 1.1; letter-spacing: -.03em; font-weight: 500; max-width: 28ch; margin: 24px 0 0; }
+h1 { margin: 12px 0 0; font-size: clamp(48px, 8vw, 128px); font-weight: 800; letter-spacing: -.07em; line-height: .84; }
+.tagline { font-size: clamp(19px, 1.8vw, 26px); line-height: 1.1; letter-spacing: -.03em; font-weight: 500; max-width: 34ch; margin: 18px 0 0; }
 </style>
