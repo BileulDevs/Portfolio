@@ -16,6 +16,13 @@ const localePath = useLocalePath();
 const content = useContent();
 useHead({ title: () => t("meta.projectTitle", { name: content.projects.value[index.value].name }) });
 
+const nuxtApp = useNuxtApp();
+/** Previous project faded out: back to the top (instant) before the next one fades in. */
+function toTop() {
+  const lenis = nuxtApp.$lenis as import("lenis").default | null | undefined;
+  if (lenis) lenis.scrollTo(0, { immediate: true });
+  else window.scrollTo({ top: 0 });
+}
 const close = () => navigateTo(localePath({ path: "/", hash: "#travaux" }));
 const linkTo = (slug: string) => localePath({ name: "project", params: { slug } });
 
@@ -30,6 +37,6 @@ onBeforeUnmount(() => removeEventListener("keydown", onKey));
 
 <template>
   <main id="main" data-header="dark">
-    <ProjectCase :index="index" :link-to="linkTo" @close="close" />
+    <ProjectCase :index="index" :link-to="linkTo" @close="close" @swapped="toTop" />
   </main>
 </template>

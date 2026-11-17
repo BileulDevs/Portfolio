@@ -5,6 +5,8 @@ export default {
   scrollBehavior(to, from, saved) {
     // Only the query changed (the project modal opening / closing): keep the page where it is.
     if (to.path === from.path && to.hash === from.hash) return false;
+    // Another project on the project page: ProjectCase scrolls to the top once the old one has faded out.
+    if (to.name === from.name && to.params.slug && to.params.slug !== from.params.slug) return false;
     // Smooth only within the same page; after a page change, jump straight to the anchor.
     const behavior: ScrollBehavior = prefersReducedMotion() || to.name !== from.name ? "instant" : "smooth";
     const target = saved ?? (to.hash ? { el: to.hash, behavior } : { top: 0 });

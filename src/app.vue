@@ -20,7 +20,8 @@ useHead(() => ({
   <ScrollProgress />
   <ClientOnly><CursorDot /></ClientOnly>
   <SiteHeader />
-  <NuxtPage :page-key="(route) => (String(route.name).startsWith('project') ? route.fullPath : String(route.name))" />
+  <!-- One key per page name: switching project keeps the page and ProjectCase fades between them. -->
+  <NuxtPage :page-key="(route) => String(route.name)" />
   <ToastHost />
 </template>
 

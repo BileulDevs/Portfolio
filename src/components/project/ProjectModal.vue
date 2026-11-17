@@ -261,9 +261,8 @@ watch(wanted, async (i, before) => {
   if (i !== null && shown.value === null) await show(i);
   else if (i === null && shown.value !== null) await hide();
   else if (i !== null && i !== before) {
-    // Switching project inside the modal: start the new one from the top.
+    // Switching project inside the modal: ProjectCase fades it, then `swapped` brings the view to the top.
     shown.value = i;
-    win.value?.scrollTo({ top: 0 });
   }
 });
 
@@ -305,7 +304,7 @@ onBeforeUnmount(() => {
       @touchend="onTouchEnd"
       @touchcancel="onTouchEnd"
     >
-      <ProjectCase :index="shown" :link-to="linkTo" replace @close="close" />
+      <ProjectCase :index="shown" :link-to="linkTo" replace @close="close" @swapped="win?.scrollTo({ top: 0 })" />
       <canvas ref="snap" class="snap" aria-hidden="true" />
     </div>
   </div>
