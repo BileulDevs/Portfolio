@@ -12,15 +12,15 @@ import { SKY_BOTTOM, SKY_TOP } from "@/utils/projectArt";
 defineProps<{ art: ArtStyle }>();
 
 const METEORS = [
-  { left: "84%", top: "8%", duration: "5s", delay: "0s" },
-  { left: "62%", top: "2%", duration: "7s", delay: "-2.6s" },
-  { left: "97%", top: "22%", duration: "9s", delay: "-5.1s" },
+  { left: "84%", top: "8%", duration: "3.5s", delay: "0s" },
+  { left: "62%", top: "2%", duration: "5s", delay: "-1.8s" },
+  { left: "97%", top: "22%", duration: "6.5s", delay: "-3.7s" },
 ];
 /** Block clouds: height from the top, width in blocks, crossing time, phase. */
 const CLOUDS = [
-  { top: "12%", blocks: 5, duration: "80s", delay: "-15s" },
-  { top: "20%", blocks: 4, duration: "110s", delay: "-60s" },
-  { top: "7%", blocks: 3, duration: "65s", delay: "-50s" },
+  { top: "12%", blocks: 5, duration: "28s", delay: "-5s" },
+  { top: "20%", blocks: 4, duration: "38s", delay: "-21s" },
+  { top: "7%", blocks: 3, duration: "22s", delay: "-17s" },
 ];
 </script>
 
@@ -57,8 +57,8 @@ const CLOUDS = [
 /* ---- Night: shooting stars (head on the left, trail up and to the right, 24.8°) ---- */
 .meteor {
   position: absolute;
-  width: 14cqw;
-  height: max(1.5px, .16cqw);
+  width: 18cqw;
+  height: max(2px, .28cqw);
   border-radius: 999px;
   transform-origin: left center;
   background: linear-gradient(90deg, rgba(236, 239, 249, .95), rgba(182, 170, 255, .45) 25%, rgba(139, 124, 246, 0));
@@ -68,10 +68,10 @@ const CLOUDS = [
 .meteor::before {
   content: "";
   position: absolute;
-  left: -.5cqw;
+  left: -.9cqw;
   top: 50%;
-  width: 1cqw;
-  height: 1cqw;
+  width: 1.8cqw;
+  height: 1.8cqw;
   translate: 0 -50%;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 70%);
@@ -91,19 +91,19 @@ const CLOUDS = [
   top: 0;
   bottom: 0;
   left: 0;
-  width: 18cqw;
-  background: linear-gradient(90deg, transparent, rgba(182, 205, 232, .16), transparent);
+  width: 26cqw;
+  background: linear-gradient(90deg, transparent, rgba(182, 205, 232, .34), transparent);
   animation: sweep 3.5s linear infinite;
 }
-@keyframes sweep { from { transform: translateX(-18cqw); } to { transform: translateX(100cqw); } }
+@keyframes sweep { from { transform: translateX(-26cqw); } to { transform: translateX(100cqw); } }
 .steam {
   position: absolute;
   left: 85.6%;
   top: 64%;
-  width: 1.2cqw;
-  height: 7cqh;
+  width: 1.8cqw;
+  height: 9cqh;
   border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 70%);
   opacity: 0;
   animation: steam 2.6s ease-out infinite;
 }
@@ -112,7 +112,7 @@ const CLOUDS = [
   0% { opacity: 0; transform: translate(0, 2cqh) scaleX(1); }
   25% { opacity: .9; }
   60% { transform: translate(.6cqw, -5cqh) scaleX(1.4); }
-  100% { opacity: 0; transform: translate(-.3cqw, -11cqh) scaleX(1.8); }
+  100% { opacity: 0; transform: translate(-.3cqw, -15cqh) scaleX(1.8); }
 }
 
 /* ---- Blocks: clouds drifting across the sky, behind the terrain (block = 1/32 of the width) ---- */

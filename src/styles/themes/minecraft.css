@@ -7,6 +7,11 @@
    components' scoped styles without !important.
    ------------------------------------------------------------------ */
 
+/* Monocraft (OFL, public/fonts/monocraft/OFL.txt): a free reproduction of the game's font, which
+   itself cannot be redistributed. Loaded only when used. */
+@font-face { font-family: "Monocraft"; src: url("/fonts/monocraft/Monocraft-Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Monocraft"; src: url("/fonts/monocraft/Monocraft-Bold.otf") format("opentype"); font-weight: 700; font-display: swap; }
+
 :root .case[data-theme="minecraft"] {
   /* Same tokens as the site, re-mapped to the game's GUI palette. */
   --lav: #c6c6c6;    /* inventory grey: page background, text on dark */
@@ -15,8 +20,8 @@
   --slate: #4a4a4a;  /* labels (5.2:1 on the grey) */
   --mist: #8b8b8b;
   --coral: #5b8731;  /* grass green */
-  --display: "Pixelify Sans", ui-monospace, monospace;
-  --mono: "Pixelify Sans", ui-monospace, monospace;
+  --display: "Monocraft", ui-monospace, monospace;
+  --mono: "Monocraft", ui-monospace, monospace;
   --mc-dirt: conic-gradient(#79553a 25%, #866043 0 50%, #79553a 0 75%, #8f6a4b 0) 0 0 / 16px 16px;
   --mc-shadow: 3px 3px 0 #3f3f3f;
   --mc-bevel: inset 3px 3px 0 #fff, inset -3px -3px 0 #555;

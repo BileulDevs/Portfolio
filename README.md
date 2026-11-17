@@ -81,7 +81,7 @@ Cliquer un projet dans le carrousel ouvre son étude de cas en modale, comme une
 
 Chaque projet peut avoir un thème (`theme` dans `src/data/projects.ts`), appliqué à la modale comme à la page :
 
-- **minecraft** (Mods Minecraft) : police pixel, bloc d'herbe et de terre, panneaux biseautés et boutons en pierre façon interface du jeu.
+- **minecraft** (Mods Minecraft) : police Monocraft sur cette page projet uniquement (reproduction libre de celle du jeu, licence OFL, fichiers et licence dans `public/fonts/monocraft/` ; la police du jeu elle-même n'est pas redistribuable), bloc d'herbe et de terre, panneaux biseautés et boutons en pierre façon interface du jeu.
 - **noxtys** (Noxtys) : reprend le design de noxtys.com — ciel étoilé, dégradés violets, cartes en verre dépoli, Space Grotesk, Instrument Sans et JetBrains Mono.
 - **azure** (Athlon Car Lease) : style portail Azure / Fluent, fil d'Ariane, cartes blanches sur fond gris, bleu Azure, Segoe UI.
 

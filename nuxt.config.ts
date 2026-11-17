@@ -24,8 +24,6 @@ export default defineNuxtConfig({
     "@fontsource/dm-mono/500.css",
     "~/styles/main.css",
     // Project themes: only fonts + selectors scoped to [data-theme], nothing loads until used.
-    "@fontsource/pixelify-sans/400.css",
-    "@fontsource/pixelify-sans/700.css",
     "~/styles/themes/minecraft.css",
     "@fontsource-variable/space-grotesk",
     "@fontsource-variable/instrument-sans",

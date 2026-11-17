@@ -199,8 +199,8 @@ const FRAG = /* glsl */ `
     float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
     float dist = length(pa - ba * h);
     // Thin bright core and a soft halo, both fading toward the tail; in and out over the flight.
-    float trail = (smoothstep(0.0035, 0.0, dist) + 0.35 * smoothstep(0.012, 0.0, dist)) * h * h;
-    float head_ = smoothstep(0.012, 0.0, length(p - head)) * 0.8;
+    float trail = (smoothstep(0.006, 0.0, dist) + 0.5 * smoothstep(0.02, 0.0, dist)) * h * h;
+    float head_ = smoothstep(0.02, 0.0, length(p - head));
     return (trail + head_) * smoothstep(0.0, 0.12, t) * smoothstep(1.0, 0.75, t);
   }
   // The scenes below use q = position as the painter draws it: x and y from the top-left, 0 to 1.
@@ -208,15 +208,15 @@ const FRAG = /* glsl */ `
   vec3 office(vec2 q, vec3 c) {
     float screen = step(0.44, q.x) * step(q.x, 0.82) * step(0.156, q.y) * step(q.y, 0.544);
     float sweep = 0.41 + fract(uTime / 3.5) * 0.44;
-    c += vec3(0.72, 0.8, 0.91) * screen * smoothstep(0.035, 0.0, abs(q.x - sweep)) * 0.16;
+    c += vec3(0.72, 0.8, 0.91) * screen * smoothstep(0.06, 0.0, abs(q.x - sweep)) * 0.34;
     for (int i = 0; i < 2; i++) {
       float f = float(i);
       float life = fract(uTime / 2.6 + f * 0.5);
-      float y = 0.70 - life * 0.15;
+      float y = 0.70 - life * 0.2;
       float x = 0.862 + f * 0.008 + sin(q.y * 45.0 + uTime * 2.0 + f * 3.0) * 0.005;
       // Soft and wide enough to read at the panel's on-screen size (a few pixels across).
-      float body = smoothstep(0.014, 0.0, abs(q.x - x) * 1.6) * smoothstep(0.05, 0.0, abs(q.y - y));
-      c += vec3(1.0) * body * step(q.y, 0.705) * (1.0 - life) * 0.45;
+      float body = smoothstep(0.02, 0.0, abs(q.x - x) * 1.6) * smoothstep(0.06, 0.0, abs(q.y - y));
+      c += vec3(1.0) * body * step(q.y, 0.705) * (1.0 - life) * 0.7;
     }
     return c;
   }
@@ -232,7 +232,7 @@ const FRAG = /* glsl */ `
   // pixels), so they pass behind the sun, the tree and the terrain.
   vec3 blocks(vec2 q, vec3 c, vec3 base) {
     float sky = smoothstep(0.08, 0.16, base.b - base.r);
-    float m = max(cloud(q, 0.2, 0.12, 5.0, 0.012), max(cloud(q, 0.55, 0.2, 4.0, 0.009), cloud(q, 0.85, 0.07, 3.0, 0.015)));
+    float m = max(cloud(q, 0.2, 0.12, 5.0, 0.036), max(cloud(q, 0.55, 0.2, 4.0, 0.027), cloud(q, 0.85, 0.07, 3.0, 0.045)));
     return mix(c, vec3(1.0), m * sky * 0.92);
   }
   void main() {
@@ -244,7 +244,7 @@ const FRAG = /* glsl */ `
     if (uScene > 0.5 && uScene < 1.5) {
       // Night sky (Noxtys): three shooting stars with staggered timing.
       vec2 p = vec2(vUv.x * 1.6, vUv.y);
-      float m = meteor(p, vec2(1.35, 0.92), 5.0, 0.0) + meteor(p, vec2(1.0, 0.98), 7.0, 2.6) + meteor(p, vec2(1.55, 0.78), 9.0, 5.1);
+      float m = meteor(p, vec2(1.35, 0.92), 3.5, 0.0) + meteor(p, vec2(1.0, 0.98), 5.0, 1.8) + meteor(p, vec2(1.55, 0.78), 6.5, 3.7);
       c += vec3(0.93, 0.92, 1.0) * min(m, 1.0);
     } else if (uScene > 1.5 && uScene < 2.5) {
       c = office(q, c);
