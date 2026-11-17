@@ -7,7 +7,7 @@ defineProps<{ project: Project; index: number }>();
 
 <template>
   <figure class="cover">
-    <img v-if="project.cover" :src="project.cover" :alt="`Aperçu de ${project.name}`" />
+    <img v-if="project.cover" :src="project.cover" :alt="$t('a11y.preview', { name: project.name })" />
     <ProjectArt v-else :project="project" :index="index" />
   </figure>
 </template>

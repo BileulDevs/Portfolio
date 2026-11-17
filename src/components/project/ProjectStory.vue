@@ -7,37 +7,37 @@ defineProps<{ project: Project }>();
 
 <template>
   <div>
-    <ProjectBlock title="Contexte">
+    <ProjectBlock :title="$t('case.context')">
       <p class="lead">{{ project.context }}</p>
     </ProjectBlock>
 
-    <ProjectBlock title="Objectifs">
+    <ProjectBlock :title="$t('case.goals')">
       <ul class="cols"><li v-for="g in project.goals" :key="g">{{ g }}</li></ul>
     </ProjectBlock>
 
-    <ProjectBlock title="Fonctionnalités">
+    <ProjectBlock :title="$t('case.features')">
       <ul class="cols"><li v-for="f in project.features" :key="f">{{ f }}</li></ul>
     </ProjectBlock>
 
-    <ProjectBlock title="Architecture">
+    <ProjectBlock :title="$t('case.architecture')">
       <p class="lead small">{{ project.architecture.summary }}</p>
       <div class="arch"><ArchitectureDiagram :project="project" /></div>
     </ProjectBlock>
 
-    <ProjectBlock title="Difficultés → solutions">
+    <ProjectBlock :title="$t('case.challenges')">
       <div v-for="c in project.challenges" :key="c.problem" class="cols versus">
-        <div><b>Problème</b>{{ c.problem }}</div>
-        <div><b>Solution</b>{{ c.solution }}</div>
+        <div><b>{{ $t("case.problem") }}</b>{{ c.problem }}</div>
+        <div><b>{{ $t("case.solution") }}</b>{{ c.solution }}</div>
       </div>
     </ProjectBlock>
 
-    <ProjectBlock title="Résultats">
+    <ProjectBlock :title="$t('case.results')">
       <div class="nums">
         <div v-for="r in project.results" :key="r.label"><strong>{{ r.value }}</strong><span>{{ r.label }}</span></div>
       </div>
     </ProjectBlock>
 
-    <ProjectBlock v-if="project.gallery?.length" title="Captures">
+    <ProjectBlock v-if="project.gallery?.length" :title="$t('case.gallery')">
       <div class="gallery"><img v-for="g in project.gallery" :key="g.src" :src="g.src" :alt="g.alt" loading="lazy" /></div>
     </ProjectBlock>
   </div>

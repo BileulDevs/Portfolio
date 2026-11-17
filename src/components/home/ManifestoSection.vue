@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useScrollProgress } from "@/composables/useScrollProgress";
-import { keyFacts } from "@/data/profile";
 import { prefersReducedMotion } from "@/composables/useMedia";
+import { useContent } from "@/composables/useContent";
 
-const TEXT =
-  "Je code toute la hauteur d'un produit, du schéma de données jusqu'à l'animation d'un bouton. Parce qu'une interface n'est jamais plus fiable que ce qu'il y a dessous, et qu'un bon backend mérite qu'on le sente à l'écran.";
-/** Words underlined in coral once lit: the ideas the paragraph hinges on. */
-const HOT = ["hauteur", "fiable", "sente"];
-const words = TEXT.split(" ").map((w) => ({ w, hot: HOT.some((h) => w.toLowerCase().startsWith(h)) }));
+const { copy, keyFacts } = useContent();
+/** The paragraph, word by word; "hot" words (the ideas it hinges on) are underlined in coral once lit. */
+const words = computed(() =>
+  copy.value.manifesto.text.split(" ").map((w) => ({ w, hot: copy.value.manifesto.hot.some((h) => w.toLowerCase().startsWith(h)) })),
+);
 
 const para = ref<HTMLElement | null>(null);
 const progress = useScrollProgress(para);
 // Read after hydration so the server HTML and the first client render match.
 const reduced = ref(false);
 onMounted(() => (reduced.value = prefersReducedMotion()));
-const lit = computed(() => (reduced.value ? words.length : Math.round(progress.value * words.length)));
+const lit = computed(() => (reduced.value ? words.value.length : Math.round(progress.value * words.value.length)));
 </script>
 
 <template>
   <section id="manifeste" class="band" aria-labelledby="mani-t">
-    <h2 id="mani-t" class="sr-only">Manifeste</h2>
+    <h2 id="mani-t" class="sr-only">{{ $t("manifesto.title") }}</h2>
     <p ref="para" class="text">
       <template v-for="(item, i) in words" :key="i"><span class="word" :class="{ lit: i < lit, hot: item.hot }">{{ item.w }}</span>{{ " " }}</template>
     </p>

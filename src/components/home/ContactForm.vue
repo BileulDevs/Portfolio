@@ -7,30 +7,32 @@ import { profile } from "@/data/profile";
  * pre-filled message. Swapping in an API (Formspree, a Netlify function…) only touches submit().
  */
 const form = reactive({ name: "", email: "", message: "" });
-const note = ref("Ouvre votre messagerie avec le message prérempli.");
+const { t } = useI18n();
+/** Which status line to show, as a key under `contact.form.` (re-translated if the language changes). */
+const note = ref<"idle" | "invalid" | "opening">("idle");
 const formEl = ref<HTMLFormElement | null>(null);
 
 function submit() {
   const el = formEl.value!;
   if (!el.checkValidity()) {
-    note.value = "Il manque un champ, ou l'e-mail n'est pas valide.";
+    note.value = "invalid";
     el.querySelector<HTMLElement>(":invalid")?.focus();
     return;
   }
-  const subject = encodeURIComponent(`Contact portfolio — ${form.name}`);
+  const subject = encodeURIComponent(t("contact.form.subject", { name: form.name }));
   const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
   window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
-  note.value = "Ouverture de votre messagerie…";
+  note.value = "opening";
 }
 </script>
 
 <template>
-  <form ref="formEl" class="mini" novalidate aria-label="Message rapide" @submit.prevent="submit">
-    <label>Nom<input v-model="form.name" name="name" autocomplete="name" required placeholder="Votre nom" /></label>
-    <label>E-mail<input v-model="form.email" name="email" type="email" autocomplete="email" required placeholder="vous@exemple.fr" /></label>
-    <label>Message<input v-model="form.message" name="message" required placeholder="Le poste, la mission, le projet…" /></label>
-    <button type="submit">Envoyer</button>
-    <p class="note" aria-live="polite">{{ note }}</p>
+  <form ref="formEl" class="mini" novalidate :aria-label="$t('a11y.quickMessage')" @submit.prevent="submit">
+    <label>{{ $t("contact.form.name") }}<input v-model="form.name" name="name" autocomplete="name" required :placeholder="$t('contact.form.namePlaceholder')" /></label>
+    <label>{{ $t("contact.form.email") }}<input v-model="form.email" name="email" type="email" autocomplete="email" required :placeholder="$t('contact.form.emailPlaceholder')" /></label>
+    <label>{{ $t("contact.form.message") }}<input v-model="form.message" name="message" required :placeholder="$t('contact.form.messagePlaceholder')" /></label>
+    <button type="submit">{{ $t("contact.form.send") }}</button>
+    <p class="note" aria-live="polite">{{ $t(`contact.form.${note}`) }}</p>
   </form>
 </template>
 

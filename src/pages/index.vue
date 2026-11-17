@@ -13,5 +13,6 @@ definePageMeta({ name: "home" });
       <ContactSection />
     </main>
     <SiteFooter />
+    <ProjectModal />
   </div>
 </template>

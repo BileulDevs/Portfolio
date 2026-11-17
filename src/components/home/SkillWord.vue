@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Tech } from "@/data/types";
-import { levels } from "@/data/stack";
+import { useContent } from "@/composables/useContent";
 
 /** Outlined word filled in proportion to mastery: the fill is the information. */
 defineProps<{ tech: Tech }>();
+const { levels } = useContent();
 </script>
 
 <template>

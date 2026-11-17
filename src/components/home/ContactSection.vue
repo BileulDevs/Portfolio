@@ -4,9 +4,11 @@ import { profile } from "@/data/profile";
 
 <template>
   <section id="contact" class="band contact" data-header="dark" aria-labelledby="contact-t">
-    <h2 id="contact-t">On construit <em>quoi</em>&nbsp;?</h2>
+    <h2 id="contact-t">{{ $t("contact.titleBefore") }} <em>{{ $t("contact.titleEm") }}</em>{{ $t("contact.titleAfter") }}</h2>
     <div class="grid">
-      <BlobLink class="blob" tone="dark" :to="`mailto:${profile.email}`" cursor="Écrire">Écrire<br />un e-mail</BlobLink>
+      <BlobLink class="blob" tone="dark" :to="`mailto:${profile.email}`" :cursor="$t('cursor.write')">
+        {{ $t("contact.ctaLine1") }}<br />{{ $t("contact.ctaLine2") }}
+      </BlobLink>
       <ContactLinks />
     </div>
     <ContactForm />

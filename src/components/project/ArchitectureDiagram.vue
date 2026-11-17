@@ -7,6 +7,7 @@ import type { Project } from "@/data/types";
  * The first node of the data is the "core" and is drawn in coral.
  */
 const props = defineProps<{ project: Project }>();
+const { t } = useI18n();
 
 const WIDTH = 900;
 /** Vertical room per node in the busiest column; labels need ~80 units under each node. */
@@ -38,7 +39,9 @@ const layout = computed(() => {
   });
   return { height, pos, paths };
 });
-const label = computed(() => `Architecture de ${props.project.name} : ${props.project.architecture.nodes.map((n) => n.label).join(", ")}`);
+const label = computed(() =>
+  t("a11y.architecture", { name: props.project.name, nodes: props.project.architecture.nodes.map((n) => n.label).join(", ") }),
+);
 </script>
 
 <template>

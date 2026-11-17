@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { projects } from "@/data/projects";
+import { useContent } from "@/composables/useContent";
+
+const { projects } = useContent();
 </script>
 
 <template>
   <section id="travaux" class="band work" aria-labelledby="work-t">
     <div class="head">
-      <h2 id="work-t" v-reveal class="big-title rv">Les <em>chantiers.</em></h2>
-      <p class="hint mono">Glisser · flèches · cliquer pour ouvrir</p>
+      <h2 id="work-t" v-reveal class="big-title rv">{{ $t("work.title") }} <em>{{ $t("work.titleEm") }}</em></h2>
+      <p class="hint mono">{{ $t("work.hint") }}</p>
     </div>
     <!-- Browser-only: WebGL and reduced-motion checks at setup. -->
     <ClientOnly><CurvedCarousel :projects="projects" /></ClientOnly>

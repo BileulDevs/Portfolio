@@ -1,0 +1,53 @@
+/* ------------------------------------------------------------------
+   Theme "azure" — case study as an Azure portal / Fluent page:
+   neutral grey canvas, white cards with soft depth, Azure blue, Segoe UI.
+   Enabled by `theme: "azure"` on a project (src/data/projects.ts).
+   Selectors start with `:root .case[data-theme]` to outrank scoped styles.
+   ------------------------------------------------------------------ */
+
+:root .case[data-theme="azure"] {
+  --lav: #f3f2f1;    /* neutral canvas; also text on the deep-blue bands */
+  --ink: #201f1e;    /* body text (15:1) */
+  --base: #243a5e;   /* deep blue: cover, diagram, "next" band */
+  --slate: #605e5c;  /* secondary text (5.9:1) */
+  --mist: #c7e0f4;   /* light blue: secondary text on the deep blue */
+  --coral: #0078d4;  /* Azure blue */
+  --display: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "Cascadia Code", Consolas, ui-monospace, monospace;
+  --az-depth: 0 1.6px 3.6px rgba(0, 0, 0, .13), 0 .3px .9px rgba(0, 0, 0, .11);
+  font-family: var(--display);
+}
+
+:root .case[data-theme="azure"] * { letter-spacing: 0; }
+
+/* Hero = portal page header: white bar, breadcrumb, semibold title. */
+:root .case[data-theme="azure"] .hero { background: #fff; border-bottom: 1px solid #edebe9; padding-bottom: 32px; }
+:root .case[data-theme="azure"] .hero .mono { color: var(--coral); text-transform: none; font-size: 14px; }
+:root .case[data-theme="azure"] .hero .mono::before { content: var(--crumb); /* translated, set by ProjectCase */ color: var(--slate); }
+:root .case[data-theme="azure"] .hero h1 { font-size: clamp(40px, 7vw, 96px); font-weight: 600; line-height: 1.05; }
+:root .case[data-theme="azure"] .hero .tagline { font-weight: 400; color: #323130; font-size: clamp(18px, 1.8vw, 24px); max-width: 48ch; }
+
+:root .case[data-theme="azure"] .cover { margin-top: 32px; border-radius: 4px; box-shadow: var(--az-depth); }
+
+/* Each block = a card. */
+:root .case[data-theme="azure"] .facts,
+:root .case[data-theme="azure"] .block { background: #fff; padding: 20px 24px; border-radius: 4px; box-shadow: var(--az-depth); }
+:root .case[data-theme="azure"] .block + .block { margin-top: 16px; }
+:root .case[data-theme="azure"] .facts dt,
+:root .case[data-theme="azure"] .block h2 { font-family: var(--display); text-transform: none; font-size: 14px; font-weight: 600; color: var(--ink); }
+:root .case[data-theme="azure"] .facts a { color: var(--coral); }
+:root .case[data-theme="azure"] .cols li,
+:root .case[data-theme="azure"] .versus { border-top: 1px solid #edebe9; font-size: 16px; }
+:root .case[data-theme="azure"] .versus b { font-family: var(--display); text-transform: none; font-size: 12px; font-weight: 600; }
+:root .case[data-theme="azure"] .arch { border-radius: 4px; }
+:root .case[data-theme="azure"] .nums strong { font-weight: 600; color: var(--coral); }
+
+:root .case[data-theme="azure"] .next strong { font-weight: 600; }
+:root .case[data-theme="azure"] .next:hover strong { color: var(--mist); }
+
+/* Dock = Fluent buttons: primary blue squares, white pill. */
+:root .case[data-theme="azure"] .dock .round { border-radius: 4px; background: var(--coral); color: #fff; }
+:root .case[data-theme="azure"] .dock .round:hover { background: #106ebe; color: #fff; }
+:root .case[data-theme="azure"] .dock .pill { border-radius: 4px; background: #fff; color: var(--ink); border: 1px solid #8a8886; }
+:root .case[data-theme="azure"] .dock .pill button { border-radius: 2px; }
+:root .case[data-theme="azure"] .dock .pill button:hover { background: var(--lav); color: var(--ink); }

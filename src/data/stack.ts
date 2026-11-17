@@ -1,15 +1,10 @@
-import type { Level, StackCategory } from "./types";
+import type { StackCategoryData } from "./types";
 
-export const levels: Record<Level, { short: string; long: string }> = {
-  3: { short: "Production", long: "Usage quotidien, en production" },
-  2: { short: "Solide", long: "Maîtrise solide, projets livrés" },
-  1: { short: "Notions", long: "Notions, projets ponctuels" },
-};
+/** Technologies by area and mastery level. Area names and level wording live in i18n/i18n.config.ts. */
 
-export const stack: StackCategory[] = [
+export const stack: StackCategoryData[] = [
   {
     id: "front",
-    label: "Frontend",
     items: [
       { name: "TypeScript", level: 3 },
       { name: "Vue.js / Nuxt", level: 3 },
@@ -23,7 +18,6 @@ export const stack: StackCategory[] = [
   },
   {
     id: "back",
-    label: "Backend & API",
     items: [
       { name: "Node.js / Express", level: 3 },
       { name: "C# / .NET", level: 3 },
@@ -37,7 +31,6 @@ export const stack: StackCategory[] = [
   },
   {
     id: "data",
-    label: "Données",
     items: [
       { name: "PostgreSQL", level: 3 },
       { name: "MySQL", level: 2 },
@@ -47,7 +40,6 @@ export const stack: StackCategory[] = [
   },
   {
     id: "cloud",
-    label: "Cloud & DevOps",
     items: [
       { name: "Azure", level: 3 },
       { name: "Azure DevOps", level: 3 },
@@ -60,7 +52,6 @@ export const stack: StackCategory[] = [
   },
   {
     id: "quality",
-    label: "Qualité & méthode",
     items: [
       { name: "Code review", level: 3 },
       { name: "Scrum", level: 3 },

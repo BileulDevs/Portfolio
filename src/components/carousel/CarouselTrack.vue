@@ -2,11 +2,13 @@
 import { ref } from "vue";
 import type { Project } from "@/data/types";
 import { prefersReducedMotion } from "@/composables/useMedia";
+import { useProjectModal } from "@/composables/useProjectModal";
 
 /** Native horizontal track: the carousel's fallback when WebGL is missing or motion is reduced. */
 defineProps<{ projects: Project[] }>();
 const emit = defineEmits<{ active: [index: number] }>();
 
+const { origin, linkTo } = useProjectModal();
 const GAP_PX = 20; // must match the flex gap below
 
 const track = ref<HTMLElement | null>(null);
@@ -19,13 +21,22 @@ function onScroll() {
 function scrollByCards(delta: number) {
   track.value?.scrollBy({ left: delta * cardStep(), behavior: prefersReducedMotion() ? "auto" : "smooth" });
 }
-defineExpose({ scrollByCards });
+/** Shows card `i` at once (no smooth scroll) and returns its artwork's screen rectangle. */
+function showCard(i: number) {
+  if (!track.value) return null;
+  track.value.scrollLeft = i * cardStep();
+  return track.value.querySelectorAll("canvas")[i]?.getBoundingClientRect() ?? null;
+}
+defineExpose({ scrollByCards, showCard });
+
+/** The modal dives out of the clicked card's artwork. */
+const pick = (e: MouseEvent) => (origin.value = (e.currentTarget as HTMLElement).querySelector("canvas")?.getBoundingClientRect() ?? null);
 </script>
 
 <template>
   <ul ref="track" class="track" @scroll.passive="onScroll">
     <li v-for="(p, i) in projects" :key="p.slug">
-      <NuxtLink :to="{ name: 'project', params: { slug: p.slug } }" class="card">
+      <NuxtLink :to="linkTo(p.slug)" class="card" @click="pick">
         <ProjectArt :project="p" :index="i" />
         <span class="meta"><b>{{ p.name }}</b><span class="mono">{{ p.kind }}</span></span>
       </NuxtLink>

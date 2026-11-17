@@ -1,0 +1,79 @@
+/* ------------------------------------------------------------------
+   Theme "noxtys" — the case study in Noxtys' own design (noxtys.com):
+   night-sky void with stars, violet gradients, glass cards,
+   Space Grotesk titles, Instrument Sans text, JetBrains Mono labels.
+   Enabled by `theme: "noxtys"` on a project (src/data/projects.ts).
+   Selectors start with `:root .case[data-theme]` to outrank scoped styles.
+   ------------------------------------------------------------------ */
+
+:root .case[data-theme="noxtys"] {
+  /* Noxtys palette, mapped onto the site's tokens. */
+  --lav: #04060d;    /* --void: page background */
+  --ink: #eceff9;    /* --stellaire: text (18:1) */
+  --base: #0a0f1e;   /* --nuit: deeper panels */
+  --slate: #8a93af;  /* --muted: labels (6.6:1) */
+  --mist: #5b8def;   /* --galaxie */
+  --coral: #8b7cf6;  /* --violet */
+  --nx-gold: #e2b45a;
+  --nx-surface: rgba(139, 154, 214, .055);
+  --nx-border: 1px solid rgba(148, 163, 220, .13);
+  --nx-gradient: linear-gradient(135deg, #8b7cf6, #6a5ae0);
+  --display: "Space Grotesk Variable", system-ui, sans-serif;
+  --mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  font-family: "Instrument Sans Variable", system-ui, sans-serif;
+  /* Static starfield (three tile sizes so it never looks gridded) + a violet glow up top. */
+  background:
+    radial-gradient(1px 1px at 20px 30px, #fff, transparent) 0 0 / 190px 190px,
+    radial-gradient(1px 1px at 140px 90px, rgba(255, 255, 255, .7), transparent) 0 0 / 260px 260px,
+    radial-gradient(1.5px 1.5px at 90px 160px, rgba(236, 239, 249, .9), transparent) 0 0 / 230px 230px,
+    radial-gradient(1px 1px at 60px 210px, rgba(255, 255, 255, .5), transparent) 0 0 / 310px 310px,
+    radial-gradient(1px 1px at 250px 40px, rgba(226, 180, 90, .8), transparent) 0 0 / 470px 470px,
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139, 124, 246, .18), transparent 70%),
+    var(--lav);
+}
+
+/* Small labels: JetBrains Mono, uppercase, wide tracking (as on noxtys.com). */
+:root .case[data-theme="noxtys"] :is(.hero .mono, .facts dt, .block h2, .versus b, .next .mono) {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--slate);
+}
+
+:root .case[data-theme="noxtys"] .hero .mono::before { content: "● "; color: var(--nx-gold); }
+:root .case[data-theme="noxtys"] .hero h1 { font-family: var(--display); font-weight: 600; letter-spacing: -.03em; line-height: .95; }
+:root .case[data-theme="noxtys"] .hero .tagline { font-weight: 400; color: var(--slate); letter-spacing: -.01em; }
+
+:root .case[data-theme="noxtys"] .cover { border-radius: 18px; border: var(--nx-border); }
+
+/* Glass cards. */
+:root .case[data-theme="noxtys"] .facts,
+:root .case[data-theme="noxtys"] .block {
+  background: var(--nx-surface); border: var(--nx-border); border-radius: 18px; padding: 22px 26px;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+:root .case[data-theme="noxtys"] .block + .block { margin-top: 16px; }
+:root .case[data-theme="noxtys"] .facts a { color: var(--coral); }
+:root .case[data-theme="noxtys"] .cols li,
+:root .case[data-theme="noxtys"] .versus { border-top: var(--nx-border); }
+:root .case[data-theme="noxtys"] .arch { background: transparent; padding: 0; }
+:root .case[data-theme="noxtys"] .arch .t { fill: var(--ink); font-family: var(--display); }
+:root .case[data-theme="noxtys"] .arch .node { fill: var(--mist); }
+:root .case[data-theme="noxtys"] .arch .link { stroke: var(--slate); }
+:root .case[data-theme="noxtys"] .nums strong {
+  font-family: var(--display); font-weight: 600; letter-spacing: -.03em;
+  background: var(--nx-gradient); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+:root .case[data-theme="noxtys"] .next { background: transparent; color: var(--ink); border-top: var(--nx-border); }
+:root .case[data-theme="noxtys"] .next strong { font-family: var(--display); font-weight: 600; letter-spacing: -.03em; }
+
+/* Dock: violet gradient buttons with their glow, glass pill. */
+:root .case[data-theme="noxtys"] .dock .round {
+  border-radius: 12px; background: var(--nx-gradient); color: #fff; box-shadow: 0 4px 20px rgba(139, 124, 246, .3);
+}
+:root .case[data-theme="noxtys"] .dock .round:hover { filter: brightness(1.12); background: var(--nx-gradient); color: #fff; }
+:root .case[data-theme="noxtys"] .dock .pill {
+  border-radius: 12px; background: rgba(10, 15, 30, .8); color: var(--ink); border: var(--nx-border);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+:root .case[data-theme="noxtys"] .dock .pill span { font-family: var(--display); }
+:root .case[data-theme="noxtys"] .dock .pill button { border-radius: 10px; }
+:root .case[data-theme="noxtys"] .dock .pill button:hover { background: rgba(139, 124, 246, .22); color: var(--ink); }

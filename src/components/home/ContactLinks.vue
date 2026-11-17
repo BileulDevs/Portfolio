@@ -8,7 +8,7 @@ const { copy } = useClipboard();
 
 <template>
   <div class="links">
-    <button type="button" @click="copy(profile.email, 'Adresse copiée')">{{ profile.email }}<small>copier</small></button>
+    <button type="button" @click="copy(profile.email, $t('contact.copied'))">{{ profile.email }}<small>{{ $t("contact.copy") }}</small></button>
     <a v-for="l in profile.links" :key="l.label" :href="l.href" target="_blank" rel="noopener">{{ l.label }}<small>{{ l.display }} ↗</small></a>
   </div>
 </template>

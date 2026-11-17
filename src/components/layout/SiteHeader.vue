@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useLanguage } from "@/composables/useLanguage";
 
 /** Fixed header + menu toggle. The header switches to dark ink over the coral bands. */
 const open = ref(false);
 const onCoral = ref(false);
 const btn = ref<HTMLButtonElement | null>(null);
 const route = useRoute();
+const localePath = useLocalePath();
+/** The switch offers the language not shown, and remembers the choice (no language in the URL). */
+const { other, switchTo } = useLanguage();
 
 function toggle(force?: boolean) {
   open.value = force ?? !open.value;
@@ -32,10 +36,13 @@ onBeforeUnmount(() => { removeEventListener("keydown", onKey); io?.disconnect();
 
 <template>
   <header class="top" :class="{ dark: onCoral && !open }">
-    <NuxtLink class="logo" to="/" aria-label="Bilel Sahraoui, accueil">bs<span>.</span></NuxtLink>
-    <button ref="btn" class="menu-btn" :aria-expanded="open" aria-controls="overlay-nav" @click="toggle()">
-      <span>{{ open ? "Fermer" : "Menu" }}</span><i aria-hidden="true" />
-    </button>
+    <NuxtLink class="logo" :to="localePath('/')" :aria-label="$t('a11y.home')">bs<span>.</span></NuxtLink>
+    <div class="actions">
+      <button class="lang" type="button" :lang="other" :aria-label="$t('a11y.language')" @click="switchTo(other)">{{ other }}</button>
+      <button ref="btn" class="menu-btn" :aria-expanded="open" aria-controls="overlay-nav" @click="toggle()">
+        <span>{{ open ? $t("nav.close") : $t("nav.menu") }}</span><i aria-hidden="true" />
+      </button>
+    </div>
   </header>
   <MenuOverlay :open="open" @close="toggle(false)" />
 </template>
@@ -45,6 +52,9 @@ onBeforeUnmount(() => { removeEventListener("keydown", onKey); io?.disconnect();
 .top > * { pointer-events: auto; }
 .top.dark { color: var(--ink); }
 :global(.menu-open) .top { color: var(--ink); }
+.actions { display: flex; align-items: center; gap: 22px; }
+.lang { background: none; border: 0; cursor: pointer; color: inherit; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; text-decoration: none; padding: 8px 0; }
+.lang:hover { text-decoration: underline; }
 .logo { font-weight: 800; font-size: 22px; letter-spacing: -.04em; text-decoration: none; }
 .logo span { color: var(--coral); }
 .top.dark .logo span, :global(.menu-open) .logo span { color: inherit; }

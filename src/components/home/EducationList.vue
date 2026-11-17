@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { education } from "@/data/profile";
+import { useContent } from "@/composables/useContent";
+
+const { education } = useContent();
 </script>
 
 <template>
   <div class="edu">
-    <h3 class="mono">Formation</h3>
+    <h3 class="mono">{{ $t("career.education") }}</h3>
     <div v-for="ed in education" :key="ed.school" v-reveal class="rv item">
       <span class="mono">{{ ed.period }}</span><strong>{{ ed.degree }}</strong><span>{{ ed.school }}</span>
     </div>

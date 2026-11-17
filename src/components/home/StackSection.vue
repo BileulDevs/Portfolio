@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { stack } from "@/data/stack";
+import { useContent } from "@/composables/useContent";
+
+const { stack } = useContent();
 </script>
 
 <template>
   <section id="stack" class="band spectrum" aria-labelledby="stack-t">
-    <h2 id="stack-t" v-reveal class="big-title rv">Matière <em>première.</em></h2>
+    <h2 id="stack-t" v-reveal class="big-title rv">{{ $t("stack.title") }} <em>{{ $t("stack.titleEm") }}</em></h2>
     <div v-for="cat in stack" :key="cat.id" class="row">
       <h3 class="mono">{{ cat.label }}</h3>
       <ul>

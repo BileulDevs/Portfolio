@@ -4,7 +4,8 @@ import CarouselTrack from "./CarouselTrack.vue";
 import type { Project } from "@/data/types";
 import { useInView } from "@/composables/useInView";
 import { prefersReducedMotion } from "@/composables/useMedia";
-import { paintProject } from "@/utils/projectArt";
+import { useProjectModal } from "@/composables/useProjectModal";
+import { paintPanel } from "@/utils/projectArt";
 
 /**
  * Projects carousel: panels laid on a cylinder that bends further and splits its RGB
@@ -14,6 +15,7 @@ import { paintProject } from "@/utils/projectArt";
  * Falls back to a native horizontal track when WebGL is missing or motion is reduced.
  */
 const props = defineProps<{ projects: Project[] }>();
+const { t } = useI18n();
 
 // ---- Tunables ---------------------------------------------------------------
 /** Panel size in world units; the 1.6 ratio matches the 1600×1000 textures. */
@@ -30,6 +32,9 @@ const MIN_RADIUS = 5.5;
 const FILL_WIDE = 0.5;
 const FILL_NARROW = 0.8;
 const NARROW_PX = 760;
+/** …but never more than this share of the stage height: on wide, short stages the width rule alone
+ *  made the panel taller than the stage, cropping its top and bottom. */
+const FILL_HEIGHT = 0.86;
 /** Easing toward the target index per frame; higher = snappier. */
 const EASE = 0.085;
 /** Pixels of horizontal wheel delta per panel. */
@@ -40,8 +45,6 @@ const WHEEL_SNAP_MS = 140;
 const CLICK_SLOP_PX = 6;
 /** The ring needs enough panels that the wrap-around seam stays off-screen. */
 const MIN_PANELS = 7;
-const TEXTURE_W = 1600;
-const TEXTURE_H = 1000;
 /** DPR cap: beyond this the fill cost grows with no visible gain on soft textures. */
 const MAX_DPR = 1.75;
 
@@ -51,6 +54,8 @@ const canvas = ref<HTMLCanvasElement | null>(null);
 const track = ref<InstanceType<typeof CarouselTrack> | null>(null);
 const mode = ref<"webgl" | "dom">(prefersReducedMotion() ? "dom" : "webgl");
 const active = ref(0);
+/** HUD dot along its arc, 0 → 1: follows the panels' live position, not the index, so it glides. */
+const arc = ref(0);
 const inView = useInView(root, "100px");
 
 const count = computed(() => props.projects.length);
@@ -65,6 +70,16 @@ let wheelTimer = 0;
 let drag: { x: number; target: number; moved: boolean; lastX: number; lastT: number; v: number } | null = null;
 let panelPx = 1;
 
+/**
+ * Arc position for a (fractional) carousel position. Between the last and the first panel the
+ * ring keeps going, so the dot glides back along the arc during that step instead of jumping.
+ */
+function arcAt(p: number) {
+  const n = count.value;
+  if (n < 2) return 0.5;
+  const q = ((p % n) + n) % n;
+  return q <= n - 1 ? q / (n - 1) : 1 - (q - (n - 1));
+}
 function wrapIndex(i: number) {
   return ((Math.round(i) % count.value) + count.value) % count.value;
 }
@@ -73,8 +88,52 @@ function go(delta: number) {
   wake();
   if (mode.value === "dom") track.value?.scrollByCards(delta);
 }
+const modal = useProjectModal();
+/**
+ * Screen rectangle of the centred panel, where the project modal dives from. Read from the frame
+ * itself (render once, then scan the middle row and column for opaque pixels), so it matches what
+ * is on screen whatever the camera, curvature or canvas size.
+ */
+function centreRect() {
+  const r = stage.value!.getBoundingClientRect();
+  const h = panelPx * (PANEL_H / PANEL_W);
+  const flat = new DOMRect(r.left + (r.width - panelPx) / 2, r.top + (r.height - h) / 2, panelPx, h);
+  if (!renderer || !scene || !camera) return flat;
+  renderer.render(scene, camera);
+  const gl = renderer.getContext();
+  const W = gl.drawingBufferWidth, H = gl.drawingBufferHeight, cx = W >> 1, cy = H >> 1;
+  const row = new Uint8Array(W * 4), col = new Uint8Array(H * 4);
+  gl.readPixels(0, cy, W, 1, gl.RGBA, gl.UNSIGNED_BYTE, row);
+  gl.readPixels(cx, 0, 1, H, gl.RGBA, gl.UNSIGNED_BYTE, col);
+  const opaque = (px: Uint8Array, i: number) => px[i * 4 + 3] > 127;
+  if (!opaque(row, cx) || !opaque(col, cy)) return flat;
+  let left = cx, right = cx, bottom = cy, top = cy;
+  while (left > 0 && opaque(row, left - 1)) left--;
+  while (right < W - 1 && opaque(row, right + 1)) right++;
+  while (bottom > 0 && opaque(col, bottom - 1)) bottom--;
+  while (top < H - 1 && opaque(col, top + 1)) top++;
+  // Drawing-buffer pixels → CSS pixels (WebGL rows start at the bottom).
+  const kx = W / r.width, ky = H / r.height;
+  return new DOMRect(r.left + left / kx, r.top + (H - 1 - top) / ky, (right + 1 - left) / kx, (top + 1 - bottom) / ky);
+}
+/** Brings project `slug` to the centre at once and returns its panel's screen rectangle (see useProjectModal). */
+function locate(slug: string) {
+  const i = props.projects.findIndex((p) => p.slug === slug);
+  if (i < 0) return null;
+  active.value = i;
+  if (mode.value === "dom") return track.value?.showCard(i) ?? null;
+  // Shortest way round the ring to that project, then settle there without animating.
+  const n = count.value, base = Math.round(pos);
+  let delta = (((i - wrapIndex(base)) % n) + n) % n;
+  if (delta > n / 2) delta -= n;
+  target = pos = base + delta;
+  velocity = 0;
+  cancelAnimationFrame(raf);
+  frame(); // places the panels for the new position (centreRect then renders and measures them)
+  return centreRect();
+}
 function open(i = active.value) {
-  navigateTo({ name: "project", params: { slug: props.projects[i].slug } });
+  modal.open(props.projects[i].slug, centreRect());
 }
 
 // ---- WebGL ------------------------------------------------------------------
@@ -108,6 +167,7 @@ const FRAG = /* glsl */ `
   varying vec2 vUv;
   varying float vFacing;
   float roundedMask(vec2 uv) {
+    // 0.018 = PANEL_RADIUS (utils/projectArt.ts), so the modal can start with the same corners.
     vec2 q = abs(uv - 0.5) * vec2(1.6, 1.0) - vec2(0.8, 0.5) + 0.018;
     return 1.0 - smoothstep(0.0, 0.004, length(max(q, 0.0)) - 0.018);
   }
@@ -145,7 +205,7 @@ async function initWebGL() {
   await document.fonts.ready;
   textures = props.projects.map((p, i) => {
     const c = document.createElement("canvas");
-    paintProject(c, p, i, { width: TEXTURE_W, height: TEXTURE_H, withTitle: true, index: String(i + 1).padStart(2, "0") });
+    paintPanel(c, p, i);
     const tex = new T.CanvasTexture(c);
     // Raw colours in, raw colours out: the shader writes exactly the canvas pixels.
     tex.colorSpace = T.NoColorSpace;
@@ -183,12 +243,17 @@ function resize() {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   const fill = w < NARROW_PX ? FILL_NARROW : FILL_WIDE;
-  // Distance at which PANEL_W covers `fill` of the visible width.
-  const halfFov = (camera.fov * Math.PI) / 360;
-  camera.position.set(0, 0, PANEL_W / (fill * 2 * Math.tan(halfFov) * camera.aspect));
+  // Camera distance: far enough that the panel covers at most `fill` of the visible width AND at
+  // most FILL_HEIGHT of the visible height, whichever needs the camera further back.
+  const tan = Math.tan((camera.fov * Math.PI) / 360);
+  const fitWidth = PANEL_W / (fill * 2 * tan * camera.aspect);
+  const fitHeight = PANEL_H / (FILL_HEIGHT * 2 * tan);
+  const z = Math.max(fitWidth, fitHeight);
+  camera.position.set(0, 0, z);
   camera.lookAt(0, 0, 0);
   camera.updateProjectionMatrix();
-  panelPx = w * fill;
+  // On-screen width of the centred panel (drag and click maths use it).
+  panelPx = (w * PANEL_W) / (2 * z * tan * camera.aspect);
   wake();
 }
 
@@ -214,6 +279,7 @@ function frame() {
   renderer.render(scene, camera);
   const idx = wrapIndex(pos);
   if (idx !== active.value) active.value = idx;
+  arc.value = arcAt(pos);
   const settled = Math.abs(target - pos) < 0.0005 && Math.abs(velocity) < 0.00005 && !drag;
   // Idle when settled or off-screen: zero per-frame cost while nothing moves.
   if (!settled && inView.value) raf = requestAnimationFrame(frame);
@@ -222,6 +288,17 @@ function wake() {
   if (!raf && mode.value === "webgl" && renderer) raf = requestAnimationFrame(frame);
 }
 watch(inView, (v) => v && wake());
+// The panels show each project's name and kind: repaint them when the language changes.
+watch(
+  () => props.projects,
+  (list) => {
+    textures.forEach((tex, i) => {
+      paintPanel(tex.image as HTMLCanvasElement, list[i], i);
+      tex.needsUpdate = true;
+    });
+    wake();
+  },
+);
 
 // ---- Input (WebGL mode) ----------------------------------------------------------
 function relX(clientX: number) {
@@ -239,7 +316,7 @@ function onMove(e: PointerEvent) {
   if (!drag) {
     const centred = Math.abs(relX(e.clientX)) < 0.5;
     hovering = centred;
-    stage.value!.dataset.cursor = centred ? "Voir" : "Glisser";
+    stage.value!.dataset.cursor = centred ? t("cursor.view") : t("cursor.drag");
     wake();
     return;
   }
@@ -288,11 +365,13 @@ function onKey(e: KeyboardEvent) {
 }
 
 onMounted(() => {
+  modal.locate.value = locate;
   stage.value!.addEventListener("wheel", onWheel, { passive: false });
   if (mode.value === "webgl") initWebGL();
 });
 
 onBeforeUnmount(() => {
+  if (modal.locate.value === locate) modal.locate.value = null;
   cancelAnimationFrame(raf);
   clearTimeout(wheelTimer);
   stage.value?.removeEventListener("wheel", onWheel);
@@ -312,8 +391,8 @@ onBeforeUnmount(() => {
       class="stage"
       tabindex="0"
       role="region"
-      aria-roledescription="carrousel"
-      aria-label="Projets. Flèches gauche et droite pour naviguer, Entrée pour ouvrir."
+      :aria-roledescription="$t('a11y.carouselRole')"
+      :aria-label="$t('a11y.carousel')"
       @pointerdown="onDown"
       @pointermove="onMove"
       @pointerup="onUp"
@@ -325,8 +404,8 @@ onBeforeUnmount(() => {
       <CarouselTrack v-else ref="track" :projects="projects" @active="(i) => (active = Math.min(count - 1, i))" />
     </div>
 
-    <CarouselHud :current="current" :active="active" :count="count" @prev="go(-1)" @next="go(1)" />
-    <p class="sr-only" aria-live="polite">Projet {{ active + 1 }} sur {{ count }} : {{ current.name }}, {{ current.tagline }}</p>
+    <CarouselHud :current="current" :active="active" :count="count" :progress="mode === 'webgl' ? arc : arcAt(active)" @prev="go(-1)" @next="go(1)" @pick="modal.origin.value = mode === 'webgl' ? centreRect() : null" />
+    <p class="sr-only" aria-live="polite">{{ $t("a11y.carouselLive", { n: active + 1, count, name: current.name, tagline: current.tagline }) }}</p>
   </div>
 </template>
 

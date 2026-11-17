@@ -1,7 +1,7 @@
 <template>
   <footer class="mono">
     <span>Bilel Sahraoui · {{ new Date().getFullYear() }}</span>
-    <span>Vue 3 · Three.js · shader WebGL fait main</span>
+    <span>{{ $t("footer.made") }}</span>
   </footer>
 </template>
 

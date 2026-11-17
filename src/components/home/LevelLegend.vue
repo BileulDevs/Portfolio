@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { levels } from "@/data/stack";
+import { useContent } from "@/composables/useContent";
+
+const { levels } = useContent();
 </script>
 
 <template>

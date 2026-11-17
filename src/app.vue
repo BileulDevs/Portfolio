@@ -1,10 +1,26 @@
+<script setup lang="ts">
+/** Language-dependent <head>: lang, title, description, og:* (one URL per page, so no hreflang alternates). */
+const { t, locale, locales } = useI18n();
+const language = computed(() => locales.value.find((l) => l.code === locale.value)?.language ?? locale.value);
+useHead(() => ({
+  htmlAttrs: { lang: language.value },
+  title: t("meta.title"),
+  meta: [
+    { name: "description", content: t("meta.description") },
+    { property: "og:title", content: t("meta.title") },
+    { property: "og:description", content: t("meta.ogDescription") },
+    { property: "og:locale", content: language.value.replace("-", "_") },
+  ],
+}));
+</script>
+
 <template>
-  <a class="skip" href="#main">Aller au contenu</a>
+  <a class="skip" href="#main">{{ $t("a11y.skip") }}</a>
   <div class="grain" aria-hidden="true" />
   <ScrollProgress />
   <ClientOnly><CursorDot /></ClientOnly>
   <SiteHeader />
-  <NuxtPage :page-key="(route) => (route.name === 'project' ? route.fullPath : String(route.name))" />
+  <NuxtPage :page-key="(route) => (String(route.name).startsWith('project') ? route.fullPath : String(route.name))" />
   <ToastHost />
 </template>
 

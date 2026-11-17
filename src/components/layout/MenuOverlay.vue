@@ -6,23 +6,25 @@ import { profile } from "@/data/profile";
 const props = defineProps<{ open: boolean }>();
 defineEmits<{ close: [] }>();
 
+const localePath = useLocalePath();
+/** Section anchors on the home page, with their label key under `nav.`. */
 const items = [
-  { hash: "#manifeste", label: "Manifeste" },
-  { hash: "#stack", label: "Stack" },
-  { hash: "#travaux", label: "Travaux" },
-  { hash: "#parcours", label: "Parcours" },
-  { hash: "#contact", label: "Contact" },
-];
+  { hash: "#manifeste", key: "manifesto" },
+  { hash: "#stack", key: "stack" },
+  { hash: "#travaux", key: "work" },
+  { hash: "#parcours", key: "career" },
+  { hash: "#contact", key: "contact" },
+] as const;
 
 const nav = ref<HTMLElement | null>(null);
 watch(() => props.open, (o) => o && nextTick(() => nav.value?.querySelector("a")?.focus()));
 </script>
 
 <template>
-  <nav id="overlay-nav" ref="nav" class="overlay" :class="{ open }" aria-label="Navigation principale" :inert="!open">
+  <nav id="overlay-nav" ref="nav" class="overlay" :class="{ open }" :aria-label="$t('a11y.mainNav')" :inert="!open">
     <ol>
       <li v-for="(item, i) in items" :key="item.hash" :style="{ '--d': `${i * 0.05}s` }">
-        <NuxtLink :to="{ path: '/', hash: item.hash }" @click="$emit('close')">{{ item.label }}</NuxtLink>
+        <NuxtLink :to="localePath({ path: '/', hash: item.hash })" @click="$emit('close')">{{ $t(`nav.${item.key}`) }}</NuxtLink>
       </li>
     </ol>
     <div class="foot mono">

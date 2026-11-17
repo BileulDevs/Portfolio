@@ -7,18 +7,18 @@ defineEmits<{ close: []; go: [slug: string] }>();
 </script>
 
 <template>
-  <nav class="dock" aria-label="Navigation entre projets">
-    <button class="round" type="button" aria-label="Retour aux projets" @click="$emit('close')">←</button>
+  <nav class="dock" :aria-label="$t('a11y.projectsNav')">
+    <button class="round" type="button" :aria-label="$t('a11y.backToProjects')" @click="$emit('close')">←</button>
     <PillNav
       class="pill"
-      :prev-label="`Projet précédent : ${prev.name}`"
-      :next-label="`Projet suivant : ${next.name}`"
+      :prev-label="$t('a11y.prevNamed', { name: prev.name })"
+      :next-label="$t('a11y.nextNamed', { name: next.name })"
       @prev="$emit('go', prev.slug)"
       @next="$emit('go', next.slug)"
     >
       <span>{{ project.name }}</span>
     </PillNav>
-    <button class="round" type="button" aria-label="Fermer le projet" @click="$emit('close')">✕</button>
+    <button class="round" type="button" :aria-label="$t('a11y.closeProject')" @click="$emit('close')">✕</button>
   </nav>
 </template>
 
@@ -30,4 +30,8 @@ defineEmits<{ close: []; go: [slug: string] }>();
 .pill { background: var(--ink); color: var(--lav); }
 .pill span { min-width: 180px; text-align: center; font-weight: 700; letter-spacing: -.02em; }
 @media (max-width: 900px) { .pill span { min-width: 110px; font-size: 15px; } }
+/* Narrow phones: a long name is cut short rather than running into the side buttons. */
+@media (max-width: 480px) {
+  .pill span { min-width: 0; max-width: calc(100vw - 2 * var(--pad) - 2 * 48px - 2 * 44px - 32px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
 </style>

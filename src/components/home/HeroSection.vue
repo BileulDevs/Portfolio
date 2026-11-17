@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { profile } from "@/data/profile";
+import { useContent } from "@/composables/useContent";
+
+const { profile } = useContent();
 
 const marquee = ["TypeScript", "Node.js", "Vue.js", "Next.js", "C# / .NET", "PostgreSQL", "Azure", "Stripe", "Prisma", "Three.js"];
 </script>
@@ -15,12 +17,11 @@ const marquee = ["TypeScript", "Node.js", "Vue.js", "Next.js", "C# / .NET", "Pos
     <div class="inner">
       <h1 id="hero-title"><span class="w"><span>bilel</span></span><span class="w"><span>sahraoui<i>.</i></span></span></h1>
       <div class="row">
-        <p class="lede">Je donne de la matière aux interfaces — et des fondations au reste.</p>
-        <p class="approach">
-          Développeur Full Stack depuis plus de 3 ans. Des API fiables, des données bien modélisées et des écrans
-          qui réagissent sous la main, de l'architecture jusqu'à la mise en production.
-        </p>
-        <BlobLink class="blob" tone="light" :to="{ hash: '#travaux' }" cursor="Go">Voir les<br />travaux ↓</BlobLink>
+        <p class="lede">{{ $t("hero.lede") }}</p>
+        <p class="approach">{{ $t("hero.approach") }}</p>
+        <BlobLink class="blob" tone="light" :to="{ hash: '#travaux' }" :cursor="$t('cursor.go')">
+          {{ $t("hero.ctaLine1") }}<br />{{ $t("hero.ctaLine2") }}
+        </BlobLink>
       </div>
     </div>
     <div class="marquee mono" aria-hidden="true">

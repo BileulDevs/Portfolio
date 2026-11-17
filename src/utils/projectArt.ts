@@ -39,24 +39,6 @@ const PAINTERS: Record<ArtStyle, (g: CanvasRenderingContext2D, w: number, h: num
     g.arc(cx, cy, h * 0.022, 0, Math.PI * 2);
     g.fill();
   },
-  // SpotR: services as city blocks, a route crossing them.
-  grid(g, w, h, rnd) {
-    g.fillStyle = PALETTE.slate;
-    g.fillRect(0, 0, w, h);
-    const cols = 10, rows = 6, cw = w / cols, ch = h / rows, m = Math.max(4, w * 0.005);
-    for (let x = 0; x < cols; x++)
-      for (let y = 0; y < rows; y++) {
-        const r = rnd();
-        g.fillStyle = r > 0.9 ? PALETTE.coral : r > 0.55 ? PALETTE.base : r > 0.35 ? PALETTE.mist : PALETTE.slate;
-        g.fillRect(x * cw + m, y * ch + m, cw - 2 * m, ch - 2 * m);
-      }
-    g.strokeStyle = PALETTE.lav;
-    g.lineWidth = Math.max(2, w * 0.003);
-    g.beginPath();
-    g.moveTo(0, h * 0.7);
-    for (let x = 0; x <= w + cw; x += cw) g.lineTo(x, h * (0.3 + rnd() * 0.5));
-    g.stroke();
-  },
   // Minecraft: voxel terrain.
   voxels(g, w, h, rnd) {
     g.fillStyle = PALETTE.lav;
@@ -132,4 +114,27 @@ export function paintProject(
   g.font = `500 ${Math.round(h * 0.036)}px "DM Mono", monospace`;
   g.fillStyle = PALETTE.mist;
   g.fillText(`${opts.index ?? ""}  ${project.kind.toUpperCase()}`.trim(), pad, h - pad * 0.75);
+}
+
+/** Size of a carousel panel's artwork; the 1.6 ratio is the 3D panel's. */
+export const PANEL_ART = { width: 1600, height: 1000 };
+/** Corner radius of a panel, as a share of its height (the carousel shader's rounded mask). */
+export const PANEL_RADIUS = 0.018;
+
+/** Panels already painted, by project and text (the kind is translated): the modal copies one at every opening, painting it each time costs a frame on phones. */
+const panels = new Map<string, HTMLCanvasElement>();
+
+/** Paints a project exactly as its carousel panel shows it: artwork, title and number. */
+export function paintPanel(canvas: HTMLCanvasElement, project: Project, index: number) {
+  const key = `${project.slug}|${project.name}|${project.kind}`;
+  let done = panels.get(key);
+  if (!done) {
+    // Painted into a canvas of its own: `canvas` may be repainted with another project later.
+    done = document.createElement("canvas");
+    paintProject(done, project, index, { ...PANEL_ART, withTitle: true, index: String(index + 1).padStart(2, "0") });
+    panels.set(key, done);
+  }
+  canvas.width = done.width;
+  canvas.height = done.height;
+  canvas.getContext("2d")?.drawImage(done, 0, 0);
 }

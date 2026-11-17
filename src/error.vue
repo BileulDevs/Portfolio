@@ -1,12 +1,14 @@
 <script setup lang="ts">
-useHead({ title: "Page introuvable — Bilel Sahraoui" });
+const { t } = useI18n();
+const home = useLocalePath()("/");
+useHead({ title: () => t("meta.notFoundTitle") });
 </script>
 
 <template>
   <main id="main" class="nf">
-    <p class="mono">Erreur 404</p>
-    <h1>Rien <em>ici.</em></h1>
-    <a href="/" class="back" @click.prevent="clearError({ redirect: '/' })">← Retour à l'accueil</a>
+    <p class="mono">{{ $t("notFound.label") }}</p>
+    <h1>{{ $t("notFound.title") }} <em>{{ $t("notFound.titleEm") }}</em></h1>
+    <a :href="home" class="back" @click.prevent="clearError({ redirect: home })">{{ $t("notFound.back") }}</a>
   </main>
 </template>
 

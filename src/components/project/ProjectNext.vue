@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from "vue-router";
 import type { Project } from "@/data/types";
 
 /** Full-width link to the next case study. */
-defineProps<{ project: Project }>();
+defineProps<{ project: Project; to: RouteLocationRaw; replace?: boolean }>();
 </script>
 
 <template>
-  <NuxtLink class="next" :to="{ name: 'project', params: { slug: project.slug } }">
-    <span class="mono">Projet suivant</span>
+  <NuxtLink class="next" :to="to" :replace="replace">
+    <span class="mono">{{ $t("case.next") }}</span>
     <strong>{{ project.name }} →</strong>
   </NuxtLink>
 </template>

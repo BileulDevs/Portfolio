@@ -7,12 +7,12 @@ defineProps<{ project: Project }>();
 
 <template>
   <dl class="facts">
-    <div><dt>Rôle</dt><dd>{{ project.role }}</dd></div>
-    <div><dt>Période</dt><dd>{{ project.period }}</dd></div>
-    <div><dt>Statut</dt><dd>{{ project.status }}</dd></div>
-    <div><dt>Stack</dt><dd>{{ project.stack.join(", ") }}</dd></div>
+    <div><dt>{{ $t("case.role") }}</dt><dd>{{ project.role }}</dd></div>
+    <div><dt>{{ $t("case.period") }}</dt><dd>{{ project.period }}</dd></div>
+    <div><dt>{{ $t("case.status") }}</dt><dd>{{ project.status }}</dd></div>
+    <div><dt>{{ $t("case.stack") }}</dt><dd>{{ project.stack.join(", ") }}</dd></div>
     <div v-if="project.url">
-      <dt>Lien</dt>
+      <dt>{{ $t("case.link") }}</dt>
       <dd><a :href="project.url" target="_blank" rel="noopener">{{ project.urlLabel ?? project.url }} ↗</a></dd>
     </div>
   </dl>
