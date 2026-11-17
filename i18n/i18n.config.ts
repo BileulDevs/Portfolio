@@ -127,7 +127,7 @@ const en = {
     sound: "Sound",
     volume: "Volume",
     /** Credit shown under the feature carousel when it uses Cobblemon models. */
-    cobblemonCredit: "3D models from Cobblemon (MPL-2.0; Pikachu: CC BY-NC 3.0). Pokémon © Nintendo, Game Freak, The Pokémon Company",
+    cobblemonCredit: "3D models from Cobblemon (MPL-2.0; Pokémon models: CC BY-NC 3.0). Pokémon © Nintendo, Game Freak, The Pokémon Company",
     /** Breadcrumb shown by the "azure" theme. */
     crumb: "Home  ›  Projects  ›  ",
   },
@@ -552,7 +552,7 @@ const fr: typeof en = {
     nextFeature: "Fonctionnalité suivante",
     sound: "Son",
     volume: "Volume",
-    cobblemonCredit: "Modèles 3D issus de Cobblemon (MPL-2.0 ; Pikachu : CC BY-NC 3.0). Pokémon © Nintendo, Game Freak, The Pokémon Company",
+    cobblemonCredit: "Modèles 3D issus de Cobblemon (MPL-2.0 ; modèles de Pokémon : CC BY-NC 3.0). Pokémon © Nintendo, Game Freak, The Pokémon Company",
     crumb: "Accueil  ›  Projets  ›  ",
   },
   notFound: { label: "Erreur 404", title: "Rien", titleEm: "ici.", back: "← Retour à l'accueil" },

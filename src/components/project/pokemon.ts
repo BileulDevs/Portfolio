@@ -5,24 +5,28 @@ import type { BedrockModel } from "./bedrockModel";
 /**
  * Pokémon that can roam a feature's scene: Cobblemon's files for each, and a small behaviour that
  * pops it out of the ball, then alternates idling (with blinks) and walking to free spots.
- * Sizes follow Cobblemon: 16 model pixels = 1 block, times the species' `baseScale`.
+ * Sizes follow Cobblemon: 16 model pixels = 1 block, times the species' `baseScale`, all doubled
+ * (SCENE_SCALE) so Pikachu, the first one, reads well beside its ball.
  */
 export type Companion = "pikachu" | "chansey" | "kangaskhan" | "tauros";
 
 export interface Species {
   /** Folder under public/projects/cobblemon-mods/cobblemon/, and file names inside it. */
   files: { geo: string; animations: string; texture: string };
-  /** Cobblemon's `baseScale` (from the species data): how big the model is drawn in game. */
-  scale: number;
+  /** Cobblemon's `baseScale` (data/cobblemon/species): how big the model is drawn in game. */
+  baseScale: number;
   /** Bones only shown by Cobblemon for an expression, which would otherwise show through. */
   hide?: RegExp;
   anim: { idle: string; walk: string; blink?: string; cry?: string };
   /** Cry sound, when it starts in the cry animation (seconds) and its volume. */
   cry?: { sound: string; at: number; volume: number };
-  /** Walking speed (blocks per second) and the distance one walk loop covers, so feet match the ground. */
+  /** Walking speed, in blocks per second; the walk animation plays at real time while walking. */
   speed: number;
-  stride: number;
 }
+
+/** Every Pokémon is drawn at twice its Cobblemon size (relative sizes stay true). */
+export const SCENE_SCALE = 2;
+const cry = (name: string, at: number) => ({ sound: `${COBBLEMON}${name}/${name}_cry.ogg`, at, volume: 0.8 });
 
 const files = (dir: string, geo: string, name: string) => ({
   geo: `${COBBLEMON}${dir}/${geo}.geo.json`,
@@ -39,34 +43,35 @@ const anims = (name: string, extra: Partial<Species["anim"]> = {}): Species["ani
 export const SPECIES: Record<Companion, Species> = {
   pikachu: {
     files: files("pikachu", "pikachu_male", "pikachu"),
-    scale: 1,
+    baseScale: 0.5,
     // Emote eyes, sparking cheeks and teeth; the open mouth stays (the cry brings it forward).
     hide: /^(acting_teeth|eye_emote_|eyeshine_(right|left)2|eyelid_emote_|cheek_active_)/,
     anim: anims("pikachu", { cry: "animation.pikachu.cry" }),
-    cry: { sound: `${COBBLEMON}pikachu/pikachu_cry.ogg`, at: 0.5, volume: 0.8 },
+    cry: cry("pikachu", 0.5),
     speed: 0.55,
-    stride: 0.55,
   },
   chansey: {
     files: files("chansey", "chansey", "chansey"),
-    scale: 1,
-    anim: anims("chansey"),
-    speed: 0.5,
-    stride: 0.6,
+    baseScale: 1,
+    anim: anims("chansey", { cry: "animation.chansey.cry" }),
+    cry: cry("chansey", 0.3),
+    speed: 0.6,
   },
   kangaskhan: {
     files: files("kangaskhan", "kangaskhan", "kangaskhan"),
-    scale: 1,
-    anim: anims("kangaskhan"),
-    speed: 0.6,
-    stride: 0.9,
+    baseScale: 0.9,
+    // Alternative eyes for expressions (angry, sad, happy, hurt), on the mother and on the baby.
+    hide: /^(kid_)?(eye_angry_|eye_sad_|eyelid_happy_|eyelid_recoil_)/,
+    anim: anims("kangaskhan", { cry: "animation.kangaskhan.cry" }),
+    cry: cry("kangaskhan", 0.2),
+    speed: 0.8,
   },
   tauros: {
     files: files("tauros", "tauros", "tauros"),
-    scale: 1,
-    anim: anims("tauros"),
-    speed: 0.8,
-    stride: 1.1,
+    baseScale: 1.3,
+    anim: anims("tauros", { cry: "animation.tauros.cry" }),
+    cry: cry("tauros", 0.3),
+    speed: 1,
   },
 };
 
@@ -92,7 +97,7 @@ export interface Area {
 /** One Pokémon roaming the scene. `body` is what to add to the scene and to hit-test. */
 export function createRoamer(model: BedrockModel, species: Species, group: Group, from: { x: number; z: number }, landing: { x: number; z: number }, delay: number) {
   const mon = model.build({ hide: species.hide });
-  mon.root.scale.setScalar(PX * species.scale);
+  mon.root.scale.setScalar(PX * species.baseScale * SCENE_SCALE);
   group.add(mon.root);
   group.position.set(from.x, 0, from.z);
   group.scale.setScalar(0.001);
@@ -106,7 +111,7 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
   let nextBlink = between(BLINK_EVERY);
   let blinkAt = -1;
   /** Footprint radius (world units), to keep the others at a distance. */
-  const radius = Math.max(0.25, (model.height * PX * species.scale) / 2.5);
+  const radius = Math.max(0.25, (model.height * PX * species.baseScale * SCENE_SCALE) / 2.5);
 
   return {
     body: group,
@@ -178,7 +183,7 @@ export function createRoamer(model: BedrockModel, species: Species, group: Group
         blinkAt = t;
         nextBlink = t + between(BLINK_EVERY);
       }
-      const layers: [string, number][] = [state === "walk" ? [anim.walk, walked / species.stride] : [anim.idle, t]];
+      const layers: [string, number][] = [state === "walk" ? [anim.walk, walked / species.speed] : [anim.idle, t]];
       if (state === "cry" && anim.cry) layers.push([anim.cry, t - since]);
       if (anim.blink && blinkAt >= 0 && t - blinkAt < model.length(anim.blink)) layers.push([anim.blink, t - blinkAt]);
       mon.pose(...layers);

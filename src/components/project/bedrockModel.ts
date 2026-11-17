@@ -8,7 +8,7 @@ import type { Group, MeshBasicMaterial } from "@/components/carousel/threeParts"
  * Not supported: per-face UVs, mesh geometry, Bézier keyframes (played linearly).
  */
 type Vec3 = [number, number, number];
-interface GeoCube { origin: Vec3; size: Vec3; uv: [number, number]; inflate?: number; mirror?: boolean }
+interface GeoCube { origin: Vec3; size: Vec3; uv: [number, number]; inflate?: number; mirror?: boolean; pivot?: Vec3; rotation?: Vec3 }
 interface GeoBone { name: string; parent?: string; pivot?: Vec3; rotation?: Vec3; cubes?: GeoCube[] }
 interface Geo { "minecraft:geometry": { description: { texture_width: number; texture_height: number }; bones: GeoBone[] }[] }
 type Channel = (number | string)[] | Record<string, (number | string)[] | { pre?: (number | string)[]; post?: (number | string)[] }>;
@@ -19,11 +19,11 @@ interface AnimFile { animations: Record<string, Anim> }
 // ---- Molang (the subset these files use) --------------------------------------------------------
 /**
  * Compiles a Molang expression into a function of the animation time (seconds). Supports numbers,
- * + − * /, parentheses, unary minus, math.sin / math.cos (degrees, as in Molang) and
- * q(uery).anim_time. Anything else evaluates to 0 rather than throwing.
+ * + − * /, parentheses, unary minus, math.sin / math.cos (degrees, as in Molang), math.abs,
+ * math.clamp / math.min / math.max and q(uery).anim_time. Anything else evaluates to 0 rather than throwing.
  */
 export function compileMolang(source: string): (t: number) => number {
-  const tokens = source.toLowerCase().match(/\d*\.?\d+|[a-z_][a-z_0-9.]*|[-+*/()]/g) ?? [];
+  const tokens = source.toLowerCase().match(/\d*\.?\d+|[a-z_][a-z_0-9.]*|[-+*/(),]/g) ?? [];
   let i = 0;
   type Node = (t: number) => number;
   const peek = () => tokens[i];
@@ -45,12 +45,24 @@ export function compileMolang(source: string): (t: number) => number {
       return () => n;
     }
     if (tok === "q.anim_time" || tok === "query.anim_time") return (t) => t;
-    if ((tok === "math.sin" || tok === "math.cos") && peek() === "(") {
+    if (tok.startsWith("math.") && peek() === "(") {
       next();
-      const arg = sum();
+      const args: Node[] = [sum()];
+      while (peek() === ",") {
+        next();
+        args.push(sum());
+      }
       next(); // ")"
-      const f = tok === "math.sin" ? Math.sin : Math.cos;
-      return (t) => f((arg(t) * Math.PI) / 180);
+      const [a, b, c] = args;
+      switch (tok) {
+        case "math.sin": return (t) => Math.sin((a(t) * Math.PI) / 180);
+        case "math.cos": return (t) => Math.cos((a(t) * Math.PI) / 180);
+        case "math.abs": return (t) => Math.abs(a(t));
+        case "math.min": return (t) => Math.min(a(t), b?.(t) ?? 0);
+        case "math.max": return (t) => Math.max(a(t), b?.(t) ?? 0);
+        case "math.clamp": return (t) => Math.min(c?.(t) ?? 0, Math.max(b?.(t) ?? 0, a(t)));
+        default: return () => 0;
+      }
     }
     return () => 0;
   }
@@ -198,12 +210,23 @@ export async function loadBedrockModel(urls: { geo: string; animations: string; 
         group.rotation.set(-rest[0] * DEG, -rest[1] * DEG, rest[2] * DEG);
         for (const cube of bone.cubes ?? []) {
           const mesh = new T.Mesh(geometries.get(cube)!, material);
+          // A rotated cube turns around its own pivot (inside the bone), like the bones themselves.
+          const at = cube.rotation ? (cube.pivot ?? pivot) : pivot;
           mesh.position.set(
-            MIRROR_X * (cube.origin[0] + cube.size[0] / 2 - pivot[0]),
-            cube.origin[1] + cube.size[1] / 2 - pivot[1],
-            cube.origin[2] + cube.size[2] / 2 - pivot[2],
+            MIRROR_X * (cube.origin[0] + cube.size[0] / 2 - at[0]),
+            cube.origin[1] + cube.size[1] / 2 - at[1],
+            cube.origin[2] + cube.size[2] / 2 - at[2],
           );
-          group.add(mesh);
+          if (!cube.rotation) {
+            group.add(mesh);
+            continue;
+          }
+          const hinge = new T.Group();
+          hinge.rotation.order = "ZYX";
+          hinge.position.set(MIRROR_X * (at[0] - pivot[0]), at[1] - pivot[1], at[2] - pivot[2]);
+          hinge.rotation.set(-cube.rotation[0] * DEG, -cube.rotation[1] * DEG, cube.rotation[2] * DEG);
+          hinge.add(mesh);
+          group.add(hinge);
         }
         if (options.hide?.test(bone.name)) group.visible = false;
         (parent?.group ?? root).add(group);

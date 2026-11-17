@@ -1,6 +1,6 @@
 import { BALL_PX, COBBLEMON, createItemFactory, type ItemKind } from "./blockItems";
 import { loadBedrockModel } from "./bedrockModel";
-import { PX, SPECIES, createRoamer, type Area, type Companion, type Roamer } from "./pokemon";
+import { PX, SCENE_SCALE, SPECIES, createRoamer, type Area, type Companion, type Roamer } from "./pokemon";
 
 export type { Companion } from "./pokemon";
 
@@ -23,6 +23,12 @@ const BALL_AT = { x: -1.15, z: 0 };
 const ROAM: Area = { minX: -0.55, maxX: 1.05, minZ: -0.8, maxZ: 0.55 };
 /** Height the framing above is made for: Pikachu's (28.5 model pixels, ears up). Taller Pokémon scale the set-up. */
 const REFERENCE_HEIGHT = 28.5 * PX;
+/** Share of the scene's growth the camera distance follows (below 1: big Pokémon fill more of the view). */
+const CAMERA_FIT = 0.5;
+/** Extra room per additional Pokémon (share of the single-Pokémon ground and camera distance). */
+const CROWD_ROOM = 0.3;
+/** Share of the scene's growth the ball follows (1 = true size relative to the Pokémon). */
+const BALL_GROWTH = 0.8;
 /** The closed ball's turn: its button (on its −z side) faces the camera, a little toward the right. */
 const BALL_YAW = Math.PI + 0.55;
 /** The first Pokémon comes out after this pause (time to see the ball), the next ones this many seconds apart. */
@@ -58,30 +64,36 @@ export async function createDetailScene(
   ]);
 
   // Framing: everything grows with the tallest Pokémon, so it fits and the ball keeps its real size.
-  const tallest = Math.max(...models.map((m, i) => m.height * PX * SPECIES[companions[i]].scale), REFERENCE_HEIGHT);
+  const tallest = Math.max(...models.map((m, i) => m.height * PX * SPECIES[companions[i]].baseScale * SCENE_SCALE), REFERENCE_HEIGHT);
   const k = tallest / REFERENCE_HEIGHT;
-  const area: Area = { minX: ROAM.minX * k, maxX: ROAM.maxX * k, minZ: ROAM.minZ * k, maxZ: ROAM.maxZ * k };
-  const ballAt = { x: BALL_AT.x * k, z: BALL_AT.z * k };
+  // Several Pokémon need room side by side: the ground widens (and the camera steps back) with each one.
+  const crowd = 1 + CROWD_ROOM * (companions.length - 1);
+  const area: Area = { minX: ROAM.minX * k * crowd, maxX: ROAM.maxX * k * crowd, minZ: ROAM.minZ * k * crowd, maxZ: ROAM.maxZ * k * crowd };
+  const ballAt = { x: BALL_AT.x * k * crowd, z: BALL_AT.z * k };
   const lookAt = { x: LOOK_AT.x, y: LOOK_AT.y * k, z: LOOK_AT.z * k };
+  // The camera frames a little tighter than the ground grows: big Pokémon may fill the view.
+  const view = 1 + (k * crowd - 1) * CAMERA_FIT; // 1 for Pikachu alone: its framing stays as it was
 
   const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = T.SRGBColorSpace;
   const scene = new T.Scene();
-  const camera = new T.PerspectiveCamera(30, 1, 0.1, 50 * k);
+  const camera = new T.PerspectiveCamera(30, 1, 0.1, 50 * view);
   let swing = 0;
   let swingTarget = 0;
   function placeCamera() {
-    const d = CAMERA.distance * k;
-    camera.position.set(lookAt.x + Math.sin(swing) * d, CAMERA.height * k, lookAt.z + Math.cos(swing) * d);
+    const d = CAMERA.distance * view;
+    camera.position.set(lookAt.x + Math.sin(swing) * d, CAMERA.height * view, lookAt.z + Math.cos(swing) * d);
     camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
   }
   placeCamera();
 
   const ball = factory.make(kind);
-  ball.object.scale.setScalar(BALL_PX * PX);
-  ball.object.position.set(ballAt.x, (BALL_PX * PX) / 2, ballAt.z);
+  // At true size the ball would be a speck beside big Pokémon: it grows a little with the scene.
+  const ballSize = BALL_PX * PX * Math.max(1, k * BALL_GROWTH);
+  ball.object.scale.setScalar(ballSize);
+  ball.object.position.set(ballAt.x, ballSize / 2, ballAt.z);
   ball.object.rotation.y = BALL_YAW;
   scene.add(ball.object);
 

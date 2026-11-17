@@ -6,3 +6,9 @@ pikachu/ (pikachu_male.geo.json, pikachu.animation.json, pikachu.png) comes unmo
 (bedrock/pokemon/models|animations/0025_pikachu, textures/pokemon/0025_pikachu). Unlike the Poké Ball, these
 files carry their own licence, copied as pikachu/LICENSE.txt (Creative Commons Attribution-NonCommercial).
 Pikachu is a character owned by Nintendo, Game Freak and The Pokémon Company.
+
+chansey/, kangaskhan/, tauros/ (model, animations, texture, cry) and pikachu/pikachu_cry.ogg come unmodified
+from the same repository; each Pokémon folder carries its model licence as LICENSE.txt (Creative Commons
+Attribution-NonCommercial). safari_ball.png (textures/poke_balls) and sounds/poke_ball_send_out.ogg
+(sounds/poke_ball) come from it too. Chansey, Kangaskhan and Tauros are owned by Nintendo, Game Freak and
+The Pokémon Company.
