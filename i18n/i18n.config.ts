@@ -41,6 +41,7 @@ const en = {
     stack: "Stack",
     work: "Work",
     career: "Career",
+    passions: "Passions",
     contact: "Contact",
   },
   hero: {
@@ -68,6 +69,17 @@ const en = {
   },
   work: { title: "The", titleEm: "workshop.", hint: "Drag · arrows · click to open" },
   career: { title: "Strata.", education: "Education" },
+  passions: {
+    title: "Beyond the",
+    titleEm: "code.",
+    intro: "What keeps me curious when the editor is closed.",
+    items: [
+      { id: "dev", name: "Development", tag: "Also a hobby", text: "Side projects, Minecraft mods, trying out the latest tools: I keep building for the pleasure of it." },
+      { id: "onepiece", name: "One Piece", tag: "Manga · TCG", text: "A long-time reader of the saga and a One Piece Card Game player: deck building, reading the meta, thinking several turns ahead." },
+      { id: "cars", name: "Cars", tag: "Engineering · Design", text: "Machines where every detail is tuned, from the engine to the bodywork — the same care I put into a product." },
+      { id: "space", name: "Space", tag: "Exploration", text: "Launches, missions, astrophysics: engineering at its most ambitious, where nothing is allowed to fail." },
+    ],
+  },
   contact: {
     titleBefore: "What are we",
     titleEm: "building",
@@ -332,6 +344,7 @@ const fr: typeof en = {
     stack: "Stack",
     work: "Travaux",
     career: "Parcours",
+    passions: "Passions",
     contact: "Contact",
   },
   hero: {
@@ -358,6 +371,17 @@ const fr: typeof en = {
   },
   work: { title: "Les", titleEm: "chantiers.", hint: "Glisser · flèches · cliquer pour ouvrir" },
   career: { title: "Strates.", education: "Formation" },
+  passions: {
+    title: "Au-delà du",
+    titleEm: "code.",
+    intro: "Ce qui me rend curieux une fois l'éditeur fermé.",
+    items: [
+      { id: "dev", name: "Développement", tag: "Aussi une passion", text: "Projets perso, mods Minecraft, nouveaux outils à tester : je continue de construire pour le plaisir." },
+      { id: "onepiece", name: "One Piece", tag: "Manga · TCG", text: "Lecteur de longue date de la saga et joueur du One Piece Card Game : construction de decks, lecture de la méta, plusieurs tours d'avance." },
+      { id: "cars", name: "Automobile", tag: "Mécanique · Design", text: "Des machines où chaque détail est réglé, du moteur à la carrosserie — le même soin que je mets dans un produit." },
+      { id: "space", name: "Espace", tag: "Exploration", text: "Lancements, missions, astrophysique : l'ingénierie à son niveau le plus ambitieux, là où rien n'a le droit d'échouer." },
+    ],
+  },
   contact: {
     titleBefore: "On construit",
     titleEm: "quoi",

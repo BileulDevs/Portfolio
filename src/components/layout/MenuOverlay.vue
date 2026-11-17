@@ -13,6 +13,7 @@ const items = [
   { hash: "#stack", key: "stack" },
   { hash: "#travaux", key: "work" },
   { hash: "#parcours", key: "career" },
+  { hash: "#passions", key: "passions" },
   { hash: "#contact", key: "contact" },
 ] as const;
 

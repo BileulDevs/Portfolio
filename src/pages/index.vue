@@ -10,6 +10,7 @@ definePageMeta({ name: "home" });
       <StackSection />
       <ProjectsSection />
       <ExperienceSection />
+      <PassionsSection />
       <ContactSection />
     </main>
     <SiteFooter />
