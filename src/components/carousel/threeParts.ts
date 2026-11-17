@@ -3,14 +3,24 @@
  * of the library (~750 kB → ~150 kB); the carousel loads this module lazily.
  */
 export {
+  BoxGeometry,
   CanvasTexture,
+  Color,
+  Group,
   LinearMipmapLinearFilter,
   Mesh,
+  MeshBasicMaterial,
+  NearestFilter,
   NoColorSpace,
+  OrthographicCamera,
   PerspectiveCamera,
   PlaneGeometry,
+  Raycaster,
   Scene,
   ShaderMaterial,
+  SRGBColorSpace,
+  Texture,
+  Vector2,
   WebGLRenderer,
 } from "three";
-export type { Texture } from "three";
+export type { Material, Object3D } from "three";

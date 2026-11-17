@@ -1,0 +1,8 @@
+poke_ball.geo.json, poke_ball.animation.json and poke_ball.png come unmodified from Cobblemon:
+https://gitlab.com/cable-mc/cobblemon (common/src/main/resources/assets/cobblemon/)
+They are distributed under the Mozilla Public License 2.0: https://mozilla.org/MPL/2.0/
+
+pikachu/ (pikachu_male.geo.json, pikachu.animation.json, pikachu.png) comes unmodified from the same repository
+(bedrock/pokemon/models|animations/0025_pikachu, textures/pokemon/0025_pikachu). Unlike the Poké Ball, these
+files carry their own licence, copied as pikachu/LICENSE.txt (Creative Commons Attribution-NonCommercial).
+Pikachu is a character owned by Nintendo, Game Freak and The Pokémon Company.

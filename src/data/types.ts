@@ -40,6 +40,24 @@ export interface Decision {
   why: string;
 }
 
+/** A published release a feature points to (e.g. a mod page), shown with its logo. */
+export interface FeatureLink {
+  name: string;
+  /** Path under /public. */
+  logo: string;
+  url: string;
+}
+
+/** One feature shown as a 3D item (feature carousel): its texts, model and published pages. */
+export interface FeatureItem {
+  title: string;
+  body: string;
+  model: import("@/components/project/blockItems").ItemKind;
+  /** Pokémon that come out of the item and roam beside the details. */
+  companions?: import("@/components/project/pokemon").Companion[];
+  links: FeatureLink[];
+}
+
 export interface Challenge {
   problem: string;
   solution: string;
@@ -69,6 +87,11 @@ export interface ProjectData {
   urlLabel?: string;
   /** Optional link to the source code, shown beside `url`. */
   repo?: string;
+  /**
+   * Optional 3D item and links per feature, in the same order as the texts' `features`. When present,
+   * the features are shown as a carousel of items instead of a plain list.
+   */
+  featureItems?: Omit<FeatureItem, "title" | "body">[];
 }
 export interface Project extends ProjectData {
   name: string;
@@ -80,6 +103,8 @@ export interface Project extends ProjectData {
   context: string;
   goals: string[];
   features: string[];
+  /** Optional heading replacing "Features" (e.g. "Mods"). */
+  featuresTitle?: string;
   /** How it is built: a one-paragraph summary, then the structuring choices and their reasons. */
   architecture: {
     summary: string;

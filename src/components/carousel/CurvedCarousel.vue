@@ -6,6 +6,7 @@ import { useInView } from "@/composables/useInView";
 import { prefersReducedMotion } from "@/composables/useMedia";
 import { useProjectModal } from "@/composables/useProjectModal";
 import { paintPanel } from "@/utils/projectArt";
+import { CURVE_VERT, ROUNDED_MASK } from "./curve";
 
 /**
  * Projects carousel: panels laid on a cylinder that bends further and splits its RGB
@@ -158,20 +159,7 @@ const STARS_SLACK_MS = 4;
 let starsOnly = false;
 let lastRender = 0;
 
-const VERT = /* glsl */ `
-  uniform float uX;
-  uniform float uR;
-  varying vec2 vUv;
-  varying float vFacing;
-  void main() {
-    vUv = uv;
-    // Wrap the flat panel around a vertical cylinder whose front touches z = 0.
-    float x = position.x + uX;
-    float th = x / uR;
-    vec3 p = vec3(uR * sin(th), position.y, uR * cos(th) - uR);
-    vFacing = cos(th);
-    gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
-  }`;
+const VERT = CURVE_VERT;
 const FRAG = /* glsl */ `
   uniform sampler2D uTex;
   uniform float uVel;
@@ -181,11 +169,7 @@ const FRAG = /* glsl */ `
   uniform float uScene;
   varying vec2 vUv;
   varying float vFacing;
-  float roundedMask(vec2 uv) {
-    // 0.018 = PANEL_RADIUS (utils/projectArt.ts), so the modal can start with the same corners.
-    vec2 q = abs(uv - 0.5) * vec2(1.6, 1.0) - vec2(0.8, 0.5) + 0.018;
-    return 1.0 - smoothstep(0.0, 0.004, length(max(q, 0.0)) - 0.018);
-  }
+  ${ROUNDED_MASK}
   // A shooting star crossing the panel's sky. p is in panel units (x × 1.6, height = 1, y up);
   // it flies from start for the first 22% of its period, then rests until the next pass.
   float meteor(vec2 p, vec2 start, float period, float offset) {
