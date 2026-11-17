@@ -13,7 +13,6 @@ const { stack } = useContent();
         <SkillWord v-for="t in cat.items" :key="t.name" :tech="t" />
       </ul>
     </div>
-    <LevelLegend />
   </section>
 </template>
 

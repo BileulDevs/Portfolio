@@ -22,6 +22,8 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+/* Lenis eases the scroll itself: a CSS smooth scroll on top would make it lag twice. */
+html.lenis { scroll-behavior: auto; }
 body {
   margin: 0;
   background: var(--base);

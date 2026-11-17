@@ -27,7 +27,7 @@ export interface Tech {
 }
 
 export interface StackCategoryData {
-  id: "front" | "back" | "data" | "cloud" | "quality";
+  id: "front" | "back" | "data" | "cloud" | "quality" | "notions";
   items: Tech[];
 }
 export interface StackCategory extends StackCategoryData {

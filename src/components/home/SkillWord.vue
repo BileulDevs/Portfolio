@@ -9,7 +9,7 @@ const { levels } = useContent();
 
 <template>
   <li v-reveal class="fill" :class="`l${tech.level}`" :style="{ '--target': tech.level / 3 }" tabindex="0">
-    {{ tech.name }}<span class="tip" aria-hidden="true">{{ levels[tech.level].short }}</span><span class="sr-only"> — {{ levels[tech.level].long }}</span>
+    {{ tech.name }}<span class="sr-only">, {{ levels[tech.level].long }}</span>
   </li>
 </template>
 
@@ -25,8 +25,6 @@ const { levels } = useContent();
 }
 .fill.in { --f: var(--target); }
 .fill.l3 { -webkit-text-stroke-color: var(--coral); background-image: linear-gradient(90deg, var(--coral) calc(var(--f) * 100%), transparent calc(var(--f) * 100%)); }
-.tip { position: absolute; left: 0; top: 100%; font-family: var(--mono); font-size: 11px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; color: var(--mist); -webkit-text-stroke: 0; opacity: 0; transform: translateY(-4px); transition: .25s; white-space: nowrap; }
-.fill:hover .tip, .fill:focus .tip { opacity: 1; transform: none; }
 </style>
 
 <style>
