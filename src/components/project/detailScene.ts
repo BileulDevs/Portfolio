@@ -159,6 +159,7 @@ export async function createDetailScene(
   canvas.addEventListener("pointercancel", onUp);
   canvas.style.cursor = "grab";
   canvas.dataset.cursor = options.cursor.drag;
+  canvas.dataset.cursorSize = "small"; // a small pill, so the label does not hide the Pokémon
   canvas.style.touchAction = "pan-y";
 
   function resize() {
