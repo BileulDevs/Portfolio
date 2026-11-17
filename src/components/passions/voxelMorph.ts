@@ -1,6 +1,6 @@
 /**
  * One cloud of voxels that reshapes itself from passion to passion as the page scrolls:
- * a grass block → a straw hat → a coupé → a ringed planet. Every shape is generated here on a
+ * raw matter → a grass block → a straw hat → a coupé → a ringed planet. Every shape is generated here on a
  * voxel grid (no model files) and drawn with a single InstancedMesh, so the whole section
  * costs one draw call. Loaded lazily by PassionsSection.vue.
  */
@@ -14,7 +14,9 @@ import {
   MeshStandardMaterial,
   Object3D,
   PerspectiveCamera,
+  Quaternion,
   Scene,
+  Vector3,
   WebGLRenderer,
 } from "three";
 
@@ -37,12 +39,16 @@ interface Voxel {
   y: number;
   z: number;
   color: string;
+  /** Relative size (1 = a full voxel). */
+  size?: number;
 }
 
 interface Shape {
   voxels: Voxel[];
   /** Resting tilt of the whole shape toward the camera (radians around X). */
   tilt: number;
+  /** How far each voxel floats around its spot, in voxels (0 = a solid object). */
+  drift?: number;
 }
 
 // ---- Shapes (grid units: one voxel = 1) ----------------------------------------------------
@@ -55,6 +61,30 @@ function shellBox(x0: number, x1: number, y0: number, y1: number, z0: number, z1
       for (let z = z0; z <= z1; z++)
         if (x === x0 || x === x1 || y === y0 || y === y1 || z === z0 || z === z1) out.push({ x, y, z, color: color(x, y, z) });
   return out;
+}
+
+/**
+ * Raw matter, for the intro: a loose, floating cloud of voxels of mixed sizes in the site's
+ * colours, before it takes the shape of each passion.
+ */
+function rawMatter(): Shape {
+  const tones = [C.lav, C.mist, C.slate, C.blue, C.mist, C.coral];
+  const voxels: Voxel[] = [];
+  for (let i = 0; i < 300; i++) {
+    // Even directions on a sphere, radii denser towards the middle.
+    const u = hash(i * 3.1) * 2 - 1;
+    const a = hash(i * 5.7) * Math.PI * 2;
+    const r = 2.5 + 6.5 * Math.pow(hash(i * 9.3), 0.8);
+    const s = Math.sqrt(1 - u * u);
+    voxels.push({
+      x: Math.cos(a) * s * r,
+      y: u * r * 0.8,
+      z: Math.sin(a) * s * r,
+      color: tones[Math.floor(hash(i * 2.3) * tones.length)],
+      size: 0.35 + 0.65 * hash(i * 7.9),
+    });
+  }
+  return { voxels, tilt: 0.1, drift: 0.7 };
 }
 
 /** A grass block: green top, dirt sides with grass dripping over the top edge, pixel-noise tones. */
@@ -149,6 +179,7 @@ interface Baked {
   col: Float32Array;
   scale: Float32Array;
   tilt: number;
+  drift: number;
 }
 
 /**
@@ -172,9 +203,9 @@ function bake(shape: Shape, n: number): Baked {
     pos.set([v.x, v.y, v.z], i * 3);
     c.set(v.color);
     col.set([c.r, c.g, c.b], i * 3);
-    scale[i] = real ? 1 : 0;
+    scale[i] = real ? (v.size ?? 1) : 0;
   }
-  return { pos, col, scale, tilt: shape.tilt };
+  return { pos, col, scale, tilt: shape.tilt, drift: shape.drift ?? 0 };
 }
 
 export function createVoxelMorph(canvas: HTMLCanvasElement, maxDpr = 1.75) {
@@ -190,7 +221,7 @@ export function createVoxelMorph(canvas: HTMLCanvasElement, maxDpr = 1.75) {
   sun.position.set(4, 6, 5);
   scene.add(sun);
 
-  const shapes = [grassBlock(), strawHat(), coupe(), ringedPlanet()];
+  const shapes = [rawMatter(), grassBlock(), strawHat(), coupe(), ringedPlanet()];
   const n = Math.max(...shapes.map((s) => s.voxels.length));
   const baked = shapes.map((s) => bake(s, n));
 
@@ -212,24 +243,55 @@ export function createVoxelMorph(canvas: HTMLCanvasElement, maxDpr = 1.75) {
 
   const dummy = new Object3D();
   const color = new Color();
+  const flight = new Vector3();
+  const toLocal = new Quaternion();
+  /** Where the shape sits, one panel's width and the rainbow's height, in world units (set by setSize). */
+  let anchorX = 0;
+  let panelX = 0;
+  let flyY = 0;
 
-  /** Writes every instance for morph position `t` (0 → shapes.length − 1). */
-  function layout(t: number) {
+  const span = (t: number) => {
     const i0 = Math.min(shapes.length - 2, Math.floor(t));
-    const frac = t - i0;
-    const a = baked[i0];
-    const b = baked[i0 + 1];
+    return { i0, frac: t - i0, a: baked[i0], b: baked[i0 + 1] };
+  };
+  /** Tilt of the whole shape, eased between the two shapes of the current morph. */
+  function tiltAt(t: number) {
+    const { frac, a, b } = span(t);
+    return a.tilt + (b.tilt - a.tilt) * smooth(clamp01((frac - 0.2) / 0.6));
+  }
+
+  /** Writes every instance for morph position `t` (0 → shapes.length − 1). Needs the group's rotation of this frame. */
+  function layout(t: number, time: number) {
+    const { frac, a, b } = span(t);
+    // The flight is drawn in screen directions (right, up): bring it into the rotating group's frame.
+    toLocal.copy(group.quaternion).invert();
+    const s = group.scale.x;
     for (let i = 0; i < n; i++) {
       // Each voxel leaves a little later than the previous ones (by its delay): the shape dissolves as a wave.
       const e = smooth(clamp01((frac - 0.12 - delay[i] * 0.3) / 0.46));
       const arc = Math.sin(e * Math.PI);
       const k = i * 3;
+      // Flight, a rainbow drawn in PAGE space: each shape belongs to its panel (one panel width
+      // apart), and a voxel travels a half-circle from this panel's shape to the next one's, highest
+      // over the panel's text. The rail has slid by `frac` panels meanwhile, hence the `- frac`:
+      // shapes that are not flying move with their panel. Each voxel's height varies a little, so
+      // the stream reads as a band; the shape tightens while in flight to keep the band thin.
+      const along = (1 - Math.cos(Math.PI * e)) / 2 - frac;
+      flight
+        .set(panelX * along, flyY * arc * (0.88 + 0.24 * hash(i + 0.4)), 0)
+        .applyQuaternion(toLocal)
+        .divideScalar(s);
+      const squeeze = 1 - 0.65 * arc;
+      // Floating (raw matter): each voxel bobs around its spot and slowly tumbles; fades out as it takes shape.
+      const w = a.drift * (1 - e) + b.drift * e;
+      const ph = time * 0.8 + i * 1.7;
       dummy.position.set(
-        a.pos[k] + (b.pos[k] - a.pos[k]) * e + scatter[k] * arc * 4,
-        a.pos[k + 1] + (b.pos[k + 1] - a.pos[k + 1]) * e + scatter[k + 1] * arc * 4,
-        a.pos[k + 2] + (b.pos[k + 2] - a.pos[k + 2]) * e + scatter[k + 2] * arc * 4,
+        (a.pos[k] + (b.pos[k] - a.pos[k]) * e) * squeeze + flight.x + scatter[k] * arc * 0.8 + w * Math.sin(ph),
+        (a.pos[k + 1] + (b.pos[k + 1] - a.pos[k + 1]) * e) * squeeze + flight.y + scatter[k + 1] * arc * 0.8 + w * Math.sin(ph * 1.3 + 2),
+        (a.pos[k + 2] + (b.pos[k + 2] - a.pos[k + 2]) * e) * squeeze + flight.z + scatter[k + 2] * arc * 0.8 + w * Math.cos(ph * 0.9),
       );
-      dummy.rotation.set(scatter[k] * arc * 3, scatter[k + 1] * arc * 3, 0);
+      const tumble = w * time * 0.6;
+      dummy.rotation.set(scatter[k] * (arc * 3 + tumble), scatter[k + 1] * (arc * 3 + tumble), scatter[k + 2] * tumble);
       dummy.scale.setScalar((a.scale[i] + (b.scale[i] - a.scale[i]) * e) * (1 - 0.35 * arc));
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
@@ -238,24 +300,36 @@ export function createVoxelMorph(canvas: HTMLCanvasElement, maxDpr = 1.75) {
     }
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    const g = smooth(clamp01((frac - 0.2) / 0.6));
-    return a.tilt + (b.tilt - a.tilt) * g;
   }
 
   return {
-    setSize(w: number, h: number) {
+    /**
+     * The canvas spans one rail panel (so voxels can fly over the text): `stage` is the shape's
+     * column as a share of the canvas width, `anchor` where the shape sits (0 → 1), `rise` the
+     * rainbow's height as a share of the canvas height.
+     */
+    setSize(w: number, h: number, { stage = 1, anchor = 0.5, rise = 0.15 } = {}) {
       renderer.setPixelRatio(Math.min(devicePixelRatio, maxDpr));
       renderer.setSize(w, h, false);
       camera.aspect = w / Math.max(1, h);
       // Narrow (portrait) stages: pull back so the widest shape (the planet's ring) still fits.
-      camera.zoom = Math.min(1, camera.aspect / 1.3);
+      camera.zoom = Math.min(1, (camera.aspect * stage) / 1.3);
       camera.updateProjectionMatrix();
+      // Visible size of the plane the shape turns in (z = 0), in world units.
+      const visH = (2 * camera.position.z * Math.tan((camera.fov * Math.PI) / 360)) / camera.zoom;
+      const visW = visH * camera.aspect;
+      anchorX = (anchor - 0.5) * visW;
+      panelX = visW;
+      flyY = rise * visH;
     },
-    /** `t`: morph position, `px`/`py`: pointer −1 → 1. */
-    render(t: number, time: number, px: number, py: number) {
-      const tilt = layout(t);
-      group.rotation.set(tilt + py * 0.2, time * 0.25 + px * 0.6, 0);
-      group.position.y = Math.sin(time * 1.1) * 0.08;
+    /**
+     * `t`: morph position, `px`/`py`: pointer −1 → 1, `lean`: −1 → 1, how hard the rail is
+     * moving (the shape sways with it, like something carried along).
+     */
+    render(t: number, time: number, px: number, py: number, lean = 0) {
+      group.rotation.set(tiltAt(t) + py * 0.2, time * 0.25 + px * 0.6 + lean * 0.5, -lean * 0.12);
+      group.position.set(anchorX, Math.sin(time * 1.1) * 0.08, 0);
+      layout(t, time);
       renderer.render(scene, camera);
     },
     dispose() {

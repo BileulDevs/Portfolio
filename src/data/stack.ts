@@ -12,8 +12,6 @@ export const stack: StackCategoryData[] = [
       { name: "HTML / CSS", level: 3 },
       { name: "Tailwind", level: 2 },
       { name: "Three.js", level: 2 },
-      { name: "Angular", level: 1 },
-      { name: "React Native", level: 1 },
     ],
   },
   {
@@ -26,7 +24,6 @@ export const stack: StackCategoryData[] = [
       { name: "Clean Architecture", level: 2 },
       { name: "Microservices", level: 2 },
       { name: "Java", level: 2 },
-      { name: "Laravel / Symfony", level: 1 },
     ],
   },
   {
@@ -57,6 +54,15 @@ export const stack: StackCategoryData[] = [
       { name: "Scrum", level: 3 },
       { name: "RGPD · DSA", level: 3 },
       { name: "Tests (Vitest)", level: 2 },
+    ],
+  },
+  {
+    // Technologies used on occasional projects, kept apart from the main stack.
+    id: "notions",
+    items: [
+      { name: "React Native", level: 1 },
+      { name: "Laravel / Symfony", level: 1 },
+      { name: "Angular", level: 1 },
     ],
   },
 ];
