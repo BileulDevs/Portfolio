@@ -18,7 +18,8 @@ const featuresTitle = computed(() => props.project.featuresTitle ?? t("case.feat
 const featureItems = computed<FeatureItem[] | null>(() => {
   const items = props.project.featureItems;
   if (!items) return null;
-  return props.project.features.map((f, i) => ({ ...split(f), model: items[i]?.model ?? "grass", companions: items[i]?.companions, links: items[i]?.links ?? [] }));
+  const details = props.project.featureDetails;
+  return props.project.features.map((f, i) => ({ ...split(f), details: details?.[i], tech: items[i]?.tech, model: items[i]?.model ?? "grass", companions: items[i]?.companions, links: items[i]?.links ?? [] }));
 });
 </script>
 

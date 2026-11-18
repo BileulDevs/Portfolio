@@ -121,6 +121,7 @@ const en = {
     next: "Next project",
     featuresCarousel: "carousel",
     featuresHint: "Click an item to see the details",
+    tech: "Key techniques",
     openFeature: "Show details: {name}",
     prevFeature: "Previous feature",
     nextFeature: "Next feature",
@@ -393,6 +394,44 @@ const en = {
         "Cobblemon Spawner: a Pokémon spawner block for adventure maps, set up from a 3D interface",
         "Cobblemon Ultra-Beasts: a wormhole into Ultra Space, a dimension built to hunt every Ultra Beast",
       ],
+      /** Technical details per mod, in the same order as `features`: shown when a mod is opened. */
+      featureDetails: [
+        [
+          "Pokédex tab added by mixin, out of reach of Cobblemon's casts",
+          "Spawn data sent once on join, cached on the client",
+          "Jade code loaded only by Jade: no crash without it",
+        ],
+        [
+          "Site search off the server thread (CompletableFuture)",
+          "Houses prebuilt by chunk tickets, paused when the server lags",
+          "Live daily reset: the level swapped in a single tick",
+        ],
+        [
+          "Every write through a single StatAwarder",
+          "Lowest-priority listeners, mixins where Cobblemon has no event",
+          "Pokédex stats rebuilt from state, never counted",
+        ],
+        [
+          "Throttling removed 4,000 Pokédex lookups per player per tick",
+          "Species resolved once into an immutable cache",
+          "Shiny boost checked at spawn in two map lookups",
+        ],
+        [
+          "Polymorphic Gson adapter for the JSON conditions",
+          "Progress stored in the Pokémon's own NBT",
+          "Counters synced to the client as they change",
+        ],
+        [
+          "Pokémon tagged with the spawner's position, no UUID tracking",
+          "Weighted draw filtered by time and weather",
+          "Hand-drawn Kotlin screens with animated 3D models",
+        ],
+        [
+          "One-player lease that survives restarts",
+          "Bounding boxes: ~885,000 fewer NBT entries per save",
+          "Structure meshes preloaded before the cinematic",
+        ],
+      ],
       architecture: {
         summary: "Java projects built with Gradle that add content on top of Cobblemon, itself a Minecraft mod: items, entities, a dimension and spawn data, released for each supported game version on CurseForge and Modrinth.",
         decisions: [
@@ -547,6 +586,7 @@ const fr: typeof en = {
     next: "Projet suivant",
     featuresCarousel: "carrousel",
     featuresHint: "Clique sur un objet pour voir le détail",
+    tech: "Techniques clés",
     openFeature: "Voir le détail : {name}",
     prevFeature: "Fonctionnalité précédente",
     nextFeature: "Fonctionnalité suivante",
@@ -814,6 +854,43 @@ const fr: typeof en = {
         "Cobblemon Marks Quests : des marques obtenues par objectifs plutôt que par chance, chaque condition configurable en JSON",
         "Cobblemon Spawner : un bloc spawner de Pokémon pour les maps d'aventure, réglé depuis une interface 3D",
         "Cobblemon Ultra-Beasts : un trou de ver vers l'Ultra-Space, une dimension pensée pour chasser toutes les Ultra-Chimères",
+      ],
+      featureDetails: [
+        [
+          "Onglet Pokédex ajouté par mixin, hors de portée des casts de Cobblemon",
+          "Données d'apparition envoyées une fois à la connexion, en cache côté client",
+          "Code Jade chargé par Jade seul : aucun crash sans lui",
+        ],
+        [
+          "Recherche de sites hors du thread serveur (CompletableFuture)",
+          "Refuges préconstruits par tickets de chunk, en pause si le serveur rame",
+          "Régénération à chaud : le niveau remplacé en un seul tick",
+        ],
+        [
+          "Toutes les écritures passent par un seul StatAwarder",
+          "Écouteurs en priorité minimale, mixins là où Cobblemon n'a pas d'événement",
+          "Stats du Pokédex recalculées depuis l'état, jamais comptées",
+        ],
+        [
+          "Un throttling qui évite 4 000 lectures du Pokédex par joueur et par tick",
+          "Espèces résolues une fois dans un cache immuable",
+          "Bonus shiny vérifié à l'apparition en deux lectures de map",
+        ],
+        [
+          "Adaptateur Gson polymorphe pour les conditions JSON",
+          "Progression stockée dans le NBT du Pokémon",
+          "Compteurs synchronisés au client dès qu'ils changent",
+        ],
+        [
+          "Pokémon marqués avec la position du spawner, sans suivi par UUID",
+          "Tirage pondéré filtré par l'heure et la météo",
+          "Écrans Kotlin dessinés à la main, modèles 3D animés",
+        ],
+        [
+          "Bail « un joueur à la fois » qui survit aux redémarrages",
+          "Boîtes englobantes : ~885 000 entrées NBT en moins par sauvegarde",
+          "Maillages de la structure préchargés avant la cinématique",
+        ],
       ],
       architecture: {
         summary: "Des projets Java construits avec Gradle qui ajoutent du contenu à Cobblemon, lui-même un mod Minecraft : objets, entités, une dimension et des données d'apparition, publiés pour chaque version du jeu supportée sur CurseForge et Modrinth.",

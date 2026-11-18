@@ -54,6 +54,10 @@ export interface FeatureLink {
 export interface FeatureItem {
   title: string;
   body: string;
+  /** Technical details, shown as a list when the feature is opened. */
+  details?: string[];
+  /** Key techniques, shown as badges above the details (not translated). */
+  tech?: string[];
   model: import("@/components/project/blockItems").ItemKind;
   /** Pokémon that come out of the item and roam beside the details. */
   companions?: import("@/components/project/pokemon").Companion[];
@@ -93,7 +97,7 @@ export interface ProjectData {
    * Optional 3D item and links per feature, in the same order as the texts' `features`. When present,
    * the features are shown as a carousel of items instead of a plain list.
    */
-  featureItems?: Omit<FeatureItem, "title" | "body">[];
+  featureItems?: Omit<FeatureItem, "title" | "body" | "details">[];
 }
 export interface Project extends ProjectData {
   name: string;
@@ -107,6 +111,8 @@ export interface Project extends ProjectData {
   features: string[];
   /** Optional heading replacing "Features" (e.g. "Mods"). */
   featuresTitle?: string;
+  /** Optional technical details per feature, in the same order as `features`. */
+  featureDetails?: string[][];
   /** How it is built: a one-paragraph summary, then the structuring choices and their reasons. */
   architecture: {
     summary: string;
