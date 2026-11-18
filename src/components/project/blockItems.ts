@@ -189,12 +189,18 @@ export const COBBLEMON = "/projects/cobblemon-mods/cobblemon/";
 export type BallKind = "poke_ball" | "safari_ball" | "beast_ball";
 export const BALL_KINDS: readonly BallKind[] = ["poke_ball", "safari_ball", "beast_ball"];
 /** Flat pixel-art items, extruded like Minecraft's held items (see `buildSprite`). */
-export type SpriteKind = "marks_ribbon";
-const SPRITES: Record<SpriteKind, string> = { marks_ribbon: "/projects/cobblemon-mods/marks-ribbon.png" };
+export type SpriteKind = "marks_ribbon" | "shiny_charm";
+/**
+ * Each sprite's image and thickness, in its own pixels: Minecraft's 16-pixel items are 1 pixel thick,
+ * so a 32-pixel image takes 2 to look the same.
+ */
+const SPRITES: Record<SpriteKind, { src: string; depthPx: number }> = {
+  marks_ribbon: { src: "/projects/cobblemon-mods/marks-ribbon.png", depthPx: 2 },
+  // The ShinyDex mod's own Shiny Charm.
+  shiny_charm: { src: "/projects/cobblemon-mods/shiny-charm.png", depthPx: 1 },
+};
 const SPRITE_KINDS = Object.keys(SPRITES) as SpriteKind[];
 const isSprite = (kind: ItemKind): kind is SpriteKind => kind in SPRITES;
-/** A sprite's thickness, in its own pixels (Minecraft's 16-pixel items are 1 pixel thick). */
-const SPRITE_DEPTH_PX = 2;
 /** Alpha below which a sprite's pixel is cut out (see makeSprite: kept below the carousel's faded opacity). */
 const SPRITE_ALPHA_TEST = 0.01;
 /** Shading of the sprite's faces, as for blocks: front and back lit, sides dimmer, underside darkest. */
@@ -221,7 +227,7 @@ type Parts = typeof import("@/components/carousel/threeParts");
  * pixels cut out), and around its outline a thin wall in each edge pixel's own colour. Returns the
  * shared geometries and texture, 1 world unit across its longer side, centred.
  */
-function buildSprite(T: Parts, img: HTMLImageElement) {
+function buildSprite(T: Parts, img: HTMLImageElement, depthPx: number) {
   const w = img.naturalWidth, h = img.naturalHeight;
   const canvas = document.createElement("canvas");
   canvas.width = w;
@@ -232,7 +238,7 @@ function buildSprite(T: Parts, img: HTMLImageElement) {
   const solid = (x: number, y: number) => x >= 0 && y >= 0 && x < w && y < h && data[(y * w + x) * 4 + 3] > 127;
 
   const s = 1 / Math.max(w, h);
-  const d = (SPRITE_DEPTH_PX * s) / 2;
+  const d = (depthPx * s) / 2;
   const positions: number[] = [];
   const colors: number[] = [];
   const colour = new T.Color();
@@ -263,7 +269,14 @@ function buildSprite(T: Parts, img: HTMLImageElement) {
   texture.generateMipmaps = false;
   texture.colorSpace = T.SRGBColorSpace;
   texture.needsUpdate = true;
-  return { face: new T.PlaneGeometry(w * s, h * s), sides, texture, depth: d };
+  const front = new T.PlaneGeometry(w * s, h * s);
+  // The back faces −z, with its texture mirrored so each pixel sits where it does on the front (and on
+  // the walls): seen from behind, the image then reads mirrored, as a real cut-out would.
+  const back = front.clone();
+  back.rotateY(Math.PI);
+  const uv = back.getAttribute("uv");
+  for (let i = 0; i < uv.count; i++) uv.setX(i, 1 - uv.getX(i));
+  return { front, back, sides, texture, depth: d };
 }
 
 /** Builds items of any kind; each `make` returns a fresh copy with its own fading materials. */
@@ -281,14 +294,14 @@ export async function createItemFactory() {
     });
   const [blocks, spriteImages, ...ballModels] = await Promise.all([
     createBlockMaterials(),
-    Promise.all(SPRITE_KINDS.map((kind) => loadImage(SPRITES[kind]))),
+    Promise.all(SPRITE_KINDS.map((kind) => loadImage(SPRITES[kind].src))),
     ...BALL_KINDS.map(loadBall),
   ]);
   const balls = new Map(BALL_KINDS.map((kind, i) => [kind, ballModels[i]]));
   const sprites = new Map(SPRITE_KINDS.map((kind, i) => {
     const img = spriteImages[i];
     if (!img) console.warn(`${kind} image unavailable, a block replaces it`);
-    return [kind, img ? buildSprite(T, img) : null];
+    return [kind, img ? buildSprite(T, img, SPRITES[kind].depthPx) : null];
   }));
   const anyBall = ballModels.find((b) => b) ?? null;
   const box = new T.BoxGeometry(1, 1, 1);
@@ -310,11 +323,10 @@ export async function createItemFactory() {
     const face = new T.MeshBasicMaterial({ map: parts.texture, alphaTest: SPRITE_ALPHA_TEST, transparent: true });
     const wall = new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide, transparent: true });
     owned.push(face, wall);
-    const front = new T.Mesh(parts.face, face);
+    const front = new T.Mesh(parts.front, face);
     front.position.z = parts.depth;
-    const back = new T.Mesh(parts.face, face);
+    const back = new T.Mesh(parts.back, face);
     back.position.z = -parts.depth;
-    back.rotation.y = Math.PI; // the image mirrored, as seen from behind
     const object = new T.Group();
     object.add(front, back, new T.Mesh(parts.sides, wall));
     return { object, materials: [face, wall], update() {} };
@@ -353,7 +365,8 @@ export async function createItemFactory() {
       blocks.dispose();
       ballModels.forEach((b) => b?.dispose());
       sprites.forEach((parts) => {
-        parts?.face.dispose();
+        parts?.front.dispose();
+        parts?.back.dispose();
         parts?.sides.dispose();
         parts?.texture.dispose();
       });
