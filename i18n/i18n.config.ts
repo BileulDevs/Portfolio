@@ -374,7 +374,7 @@ const en = {
       kind: "Open source · Java",
       /** Replaces the "Features" heading for this project. */
       featuresTitle: "Mods",
-      period: "Ongoing",
+      period: "2024 — Ongoing",
       status: "Published · CurseForge & Modrinth",
       tagline: "Over 1.3 million downloads across Java mods maintained for Fabric and NeoForge.",
       role: "Author and maintainer",
@@ -835,7 +835,7 @@ const fr: typeof en = {
       name: "Mods Minecraft",
       kind: "Open source · Java",
       featuresTitle: "Mods",
-      period: "En continu",
+      period: "2024 — En cours",
       status: "Publiés · CurseForge & Modrinth",
       tagline: "Plus de 1,3 million de téléchargements sur des mods Java maintenus pour Fabric et NeoForge.",
       role: "Auteur et mainteneur",
