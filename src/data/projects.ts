@@ -42,8 +42,8 @@ export const projects: ProjectData[] = [
       { model: "diamond", links: [{ name: "Cobblemon ShinyDex", logo: "/projects/cobblemon-mods/logos/shiny-dex.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-shiny-dex" }] },
       { model: "poke_ball", companions: ["pikachu"], links: [{ name: "Just Enough Cobblemon", logo: "/projects/cobblemon-mods/logos/just-enough-cobblemon.png", url: "https://www.curseforge.com/minecraft/mc-mods/just-enough-cobblemon" }] },
       { model: "safari_ball", companions: ["chansey", "tauros", "kangaskhan"], links: [{ name: "Cobblemon Safari", logo: "/projects/cobblemon-mods/logos/safari.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-safari" }] },
-      { model: "redstone", links: [{ name: "Cobblemon Marks Quests", logo: "/projects/cobblemon-mods/logos/cobblemon-marks.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-marks-quests" }] },
-      { model: "coal", links: [{ name: "Cobblemon Spawner", logo: "/projects/cobblemon-mods/logos/spawner.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-spawner" }] },
+      { model: "marks_ribbon", links: [{ name: "Cobblemon Marks Quests", logo: "/projects/cobblemon-mods/logos/cobblemon-marks.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-marks-quests" }] },
+      { model: "spawner", links: [{ name: "Cobblemon Spawner", logo: "/projects/cobblemon-mods/logos/spawner.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-spawner" }] },
     ],
   },
 ];

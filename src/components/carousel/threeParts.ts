@@ -4,8 +4,11 @@
  */
 export {
   BoxGeometry,
+  BufferGeometry,
   CanvasTexture,
   Color,
+  DoubleSide,
+  Float32BufferAttribute,
   Group,
   LinearMipmapLinearFilter,
   Mesh,
