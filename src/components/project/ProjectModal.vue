@@ -238,22 +238,46 @@ function lockPage(lock: boolean) {
   html.classList.toggle("modal-open", lock);
 }
 
+/**
+ * The page's scrollbar and the window's sit at the same place (the window spans 100vw), but the
+ * window's is clipped away while it flies. So the page is locked (its scrollbar removed) only once the
+ * window has landed, and unlocked as soon as it takes off: a scrollbar stays on screen throughout.
+ * Meanwhile the page must not scroll under the flying window: wheel, touch and scroll keys are held.
+ */
+const SCROLL_KEYS = new Set([" ", "PageUp", "PageDown", "Home", "End", "ArrowUp", "ArrowDown"]);
+function holdScroll(e: Event) {
+  if (!busy) return;
+  if (e instanceof KeyboardEvent && !SCROLL_KEYS.has(e.key)) return;
+  e.preventDefault();
+}
+const HOLD_EVENTS = ["wheel", "touchmove", "keydown"] as const;
+function holdPage(hold: boolean) {
+  for (const type of HOLD_EVENTS) {
+    if (hold) addEventListener(type, holdScroll, { passive: false });
+    else removeEventListener(type, holdScroll);
+  }
+}
+
 async function show(i: number) {
   returnFocus = document.activeElement as HTMLElement | null;
   shown.value = i;
-  lockPage(true);
   await nextTick();
   root.value?.focus();
   busy = true;
+  holdPage(true);
   await launch(true);
+  lockPage(true);
+  holdPage(false);
   busy = false;
 }
 async function hide() {
   busy = true;
+  holdPage(true);
+  lockPage(false);
   await launch(false);
+  holdPage(false);
   busy = false;
   shown.value = null;
-  lockPage(false);
   returnFocus?.focus({ preventScroll: true });
 }
 
@@ -281,6 +305,7 @@ onMounted(() => {
 });
 onBeforeUnmount(() => {
   removeEventListener("keydown", onKey);
+  holdPage(false);
   lockPage(false);
 });
 </script>
@@ -299,6 +324,7 @@ onBeforeUnmount(() => {
     <div
       ref="win"
       class="window"
+      :data-scroll="projects[shown].theme ?? 'site'"
       @touchstart.passive="onTouchStart"
       @touchmove="onTouchMove"
       @touchend="onTouchEnd"
@@ -313,8 +339,12 @@ onBeforeUnmount(() => {
 <style scoped>
 .modal { position: fixed; inset: 0; z-index: 65; outline: none; }
 .dim { position: fixed; inset: 0; background: #000; opacity: 0; }
-/* Stable gutter: the scrollbar comes and goes as the content scales; without it the width (and layout) would jump. */
-.window { position: fixed; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+/*
+ * Stable gutter: the scrollbar comes and goes as the content scales; without it the width (and layout) would jump.
+ * 100vw, not right: 0: the window keeps the same width whether the page behind still shows its
+ * scrollbar (while the window flies) or not (once it has landed), and its scrollbar takes that one's place.
+ */
+.window { position: fixed; top: 0; bottom: 0; left: 0; width: 100vw; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scrollbar-width: thin; }
 /* Above the content, at full-window size; squeezed onto the panel by the animation. */
 .snap { position: fixed; left: 0; top: 0; width: 100%; height: 100%; transform-origin: 0 0; opacity: 0; pointer-events: none; }
 </style>

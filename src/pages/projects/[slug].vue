@@ -14,7 +14,11 @@ const index = computed(() => Math.max(0, findProject(String(route.params.slug)))
 const { t } = useI18n();
 const localePath = useLocalePath();
 const content = useContent();
-useHead({ title: () => t("meta.projectTitle", { name: content.projects.value[index.value].name }) });
+useHead({
+  title: () => t("meta.projectTitle", { name: content.projects.value[index.value].name }),
+  // The page's scrollbar in the project's colours (rules in main.css and src/styles/themes/).
+  htmlAttrs: { "data-scroll": () => content.projects.value[index.value].theme ?? "site" },
+});
 
 const nuxtApp = useNuxtApp();
 /** Previous project faded out: back to the top (instant) before the next one fades in. */

@@ -1,9 +1,20 @@
 import { projects } from "./src/data/projects";
 
+/** Build environment variables. This file is type-checked without Node's types, hence the cast. */
+const env = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env ?? {};
+
 export default defineNuxtConfig({
   compatibilityDate: "2026-11-01",
   srcDir: "src/",
   modules: ["@nuxtjs/i18n"],
+  runtimeConfig: {
+    public: {
+      // The site's address, for absolute og:image / og:url (social networks ignore relative ones).
+      // Read when the static site is generated: NUXT_PUBLIC_SITE_URL, else Netlify's own build variable
+      // URL, else the production address.
+      siteUrl: env.NUXT_PUBLIC_SITE_URL ?? env.URL ?? "https://bilelsahraoui.netlify.app",
+    },
+  },
   // English by default, French on demand. Every text (interface and content) is in i18n/i18n.config.ts.
   i18n: {
     locales: [

@@ -53,3 +53,8 @@
 :root .case[data-theme="azure"] .dock .pill { border-radius: 4px; background: #fff; color: var(--ink); border: 1px solid #8a8886; }
 :root .case[data-theme="azure"] .dock .pill button { border-radius: 2px; }
 :root .case[data-theme="azure"] .dock .pill button:hover { background: var(--lav); color: var(--ink); }
+
+/* The project's scrollbar (data-scroll, see main.css): Azure blue, on the page's own background. */
+[data-scroll="azure"] { scrollbar-color: #0078d4 #f3f2f1; }
+[data-scroll="azure"]::-webkit-scrollbar-track { background: #f3f2f1; }
+[data-scroll="azure"]::-webkit-scrollbar-thumb { background: #0078d4; border-color: #f3f2f1; }

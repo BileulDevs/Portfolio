@@ -87,3 +87,8 @@
 :root .case[data-theme="minecraft"] .fc .links a { color: #2a5e10; }
 /* A slightly darker green on hover. */
 :root .case[data-theme="minecraft"] .fc .links a:hover { color: #1d430a; }
+
+/* The project's scrollbar (data-scroll, see main.css): grass green, on the page's own background. */
+[data-scroll="minecraft"] { scrollbar-color: #5b8731 #c6c6c6; }
+[data-scroll="minecraft"]::-webkit-scrollbar-track { background: #c6c6c6; }
+[data-scroll="minecraft"]::-webkit-scrollbar-thumb { background: #5b8731; border-color: #c6c6c6; }
