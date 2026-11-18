@@ -189,7 +189,7 @@ export const COBBLEMON = "/projects/cobblemon-mods/cobblemon/";
 export type BallKind = "poke_ball" | "safari_ball" | "beast_ball";
 export const BALL_KINDS: readonly BallKind[] = ["poke_ball", "safari_ball", "beast_ball"];
 /** Flat pixel-art items, extruded like Minecraft's held items (see `buildSprite`). */
-export type SpriteKind = "marks_ribbon" | "shiny_charm";
+export type SpriteKind = "marks_ribbon" | "shiny_charm" | "rare_candy";
 /**
  * Each sprite's image and thickness, in its own pixels: Minecraft's 16-pixel items are 1 pixel thick,
  * so a 32-pixel image takes 2 to look the same.
@@ -198,6 +198,8 @@ const SPRITES: Record<SpriteKind, { src: string; depthPx: number }> = {
   marks_ribbon: { src: "/projects/cobblemon-mods/marks-ribbon.png", depthPx: 2 },
   // The ShinyDex mod's own Shiny Charm.
   shiny_charm: { src: "/projects/cobblemon-mods/shiny-charm.png", depthPx: 1 },
+  // Cobblemon's Rare Candy (textures/item/experience_candy).
+  rare_candy: { src: `${COBBLEMON}rare_candy.png`, depthPx: 1 },
 };
 const SPRITE_KINDS = Object.keys(SPRITES) as SpriteKind[];
 const isSprite = (kind: ItemKind): kind is SpriteKind => kind in SPRITES;

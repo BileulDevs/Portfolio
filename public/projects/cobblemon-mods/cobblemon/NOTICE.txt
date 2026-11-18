@@ -19,3 +19,6 @@ Commons Attribution-NonCommercial). Poipole is owned by Nintendo, Game Freak and
 
 Exceptions: kangaskhan/kangaskhan_cry.ogg and poipole/poipole_cry.ogg come from PokeAPI
 (https://github.com/PokeAPI/cries, 115.ogg and 803.ogg), as Cobblemon's own files are silent placeholders.
+
+rare_candy.png (textures/item/experience_candy) comes unmodified from the same files, as shipped in the
+Cobblemon 1.8.4 mod.
