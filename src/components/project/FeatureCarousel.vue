@@ -133,6 +133,9 @@ function requestOpen() {
 async function openDetail() {
   openedAt = performance.now();
   open.value = true;
+  // The ring's "drag" label would linger over the details (texts, sound bar): the next move over the
+  // closed ring sets it again.
+  delete stage.value?.dataset.cursor;
   wake();
   const companions = current.value.companions;
   if (!companions?.length) return;
@@ -395,7 +398,7 @@ onBeforeUnmount(() => {
           <div v-if="open" class="detail" role="dialog" :aria-label="current.title" @keydown.stop="onKey">
             <div v-if="current.companions?.length" class="scene-wrap">
               <canvas ref="sceneCanvas" class="scene" aria-hidden="true" />
-              <div class="sound" role="group" :aria-label="$t('case.sound')">
+              <div class="sound" role="group" :aria-label="$t('case.sound')" data-cursor-quiet>
                 <button type="button" class="toggle" :aria-pressed="sound.on" @click="sound.on = !sound.on">
                   {{ $t("case.sound") }} · {{ sound.on ? "ON" : "OFF" }}
                 </button>

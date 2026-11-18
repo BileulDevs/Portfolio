@@ -6,6 +6,7 @@ import { useFinePointer, useReducedMotion } from "@/composables/useMedia";
  * Follower dot for mouse users. The native cursor stays visible (accessibility);
  * the dot grows over interactive elements and shows the label of the nearest [data-cursor]
  * (as a small pill instead of a big disc when that element also has data-cursor-size="small").
+ * Inside [data-cursor-quiet], it stays a plain dot.
  */
 const fine = useFinePointer();
 const reduced = useReducedMotion();
@@ -30,10 +31,12 @@ const onMove = (e: PointerEvent) => {
   if (e.pointerType !== "mouse") return;
   tx = e.clientX; ty = e.clientY; shown.value = true;
   const target = e.target as Element | null;
-  const labelled = target?.closest<HTMLElement>("[data-cursor]");
+  // Small controls (a volume bar) keep the plain dot: a disc or a label would cover them.
+  const quiet = !!target?.closest("[data-cursor-quiet]");
+  const labelled = quiet ? null : target?.closest<HTMLElement>("[data-cursor]");
   label.value = labelled?.dataset.cursor ?? "";
   small.value = labelled?.dataset.cursorSize === "small";
-  big.value = !!labelled || !!target?.closest("a, button, summary, [role=button], .fill");
+  big.value = !quiet && (!!labelled || !!target?.closest("a, button, summary, [role=button], .fill"));
   if (!raf) raf = requestAnimationFrame(loop);
 };
 const onLeave = () => (shown.value = false);
