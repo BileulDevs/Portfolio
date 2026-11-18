@@ -58,9 +58,9 @@ export interface FeatureItem {
   details?: string[];
   /** Key techniques, shown as badges above the details (not translated). */
   tech?: string[];
-  model: import("@/components/project/blockItems").ItemKind;
+  model: import("../components/project/kinds").ItemKind;
   /** Pokémon that come out of the item and roam beside the details. */
-  companions?: import("@/components/project/pokemon").Companion[];
+  companions?: import("../components/project/kinds").Companion[];
   links: FeatureLink[];
 }
 
