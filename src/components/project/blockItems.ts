@@ -8,8 +8,8 @@ import type { MeshBasicMaterial, Object3D } from "@/components/carousel/threePar
  * Textures are 16×16 pixel art generated here (seeded, so identical on every load), except the grass
  * side, which is the case study's own texture.
  */
-export type BlockKind = "grass" | "log" | "diamond" | "gold" | "emerald" | "redstone" | "lapis" | "iron" | "coal" | "spawner";
-export const BLOCK_KINDS: readonly BlockKind[] = ["grass", "log", "diamond", "gold", "emerald", "redstone", "lapis", "iron", "coal", "spawner"];
+export type BlockKind = "grass" | "log" | "diamond" | "gold" | "emerald" | "redstone" | "lapis" | "iron" | "coal" | "spawner" | "command";
+export const BLOCK_KINDS: readonly BlockKind[] = ["grass", "log", "diamond", "gold", "emerald", "redstone", "lapis", "iron", "coal", "spawner", "command"];
 /** Fleck colours of each ore (stone with a few clusters of them). */
 const ORES: Partial<Record<BlockKind, { seed: number; colours: string[] }>> = {
   diamond: { seed: 31, colours: ["#5decf5", "#4ad3df", "#a9f7fb", "#2fb7c4"] },
@@ -114,9 +114,39 @@ function retouchSpawner(img: HTMLImageElement) {
   return out;
 }
 
+/** Command block colours: its casing (shades and darker edge), its panel and the panel's circuit and chevron. */
+const COMMAND = {
+  casing: ["#c47a3b", "#b86f33", "#d08544", "#bd7537"],
+  edge: "#7f4a20",
+  panel: ["#3b3b3d", "#363638", "#414143"],
+  circuit: "#6a6a6e",
+  chevron: "#c9c9cf",
+};
+/**
+ * A command block face: an orange casing with a darker edge around a grey panel with a circuit grid;
+ * `chevron` adds the arrow it has on its front and back.
+ */
+function commandFace(seed: number, chevron: boolean) {
+  const casing = from(COMMAND.casing), panel = from(COMMAND.panel);
+  return paint(seed, (x, y, r) => {
+    if (x === 0 || y === 0 || x === TEX - 1 || y === TEX - 1) return COMMAND.edge;
+    const inPanel = x >= 3 && x <= 12 && y >= 3 && y <= 12;
+    if (!inPanel) return casing(r);
+    // Chevron ">" centred in the panel: two diagonal strokes meeting at (10, 7.5).
+    if (chevron && x >= 5 && x <= 10 && Math.abs(Math.abs(y - 7.5) - (10 - x)) < 0.6) return COMMAND.chevron;
+    if (x === 3 || y === 3 || x === 12 || y === 12) return COMMAND.circuit;
+    return (x + y) % 4 === 0 && !chevron ? COMMAND.circuit : panel(r);
+  });
+}
+
 /** The six faces of each block, in the order +x −x +y −y +z −z. */
 function faces(kind: BlockKind, grassSide: HTMLImageElement | null, spawner: HTMLImageElement | null): (HTMLCanvasElement | HTMLImageElement)[] {
   switch (kind) {
+    case "command": {
+      const side = commandFace(111, false);
+      const arrow = commandFace(112, true);
+      return [side, side, side, side, arrow, arrow];
+    }
     case "spawner":
       // Without its image, a coal block stands in.
       return Array(6).fill(spawner ? retouchSpawner(spawner) : ore(ORES.coal!.seed, ORES.coal!.colours));
@@ -189,7 +219,7 @@ export const COBBLEMON = "/projects/cobblemon-mods/cobblemon/";
 export type BallKind = "poke_ball" | "safari_ball" | "beast_ball";
 export const BALL_KINDS: readonly BallKind[] = ["poke_ball", "safari_ball", "beast_ball"];
 /** Flat pixel-art items, extruded like Minecraft's held items (see `buildSprite`). */
-export type SpriteKind = "marks_ribbon" | "shiny_charm" | "rare_candy";
+export type SpriteKind = "marks_ribbon" | "shiny_charm";
 /**
  * Each sprite's image and thickness, in its own pixels: Minecraft's 16-pixel items are 1 pixel thick,
  * so a 32-pixel image takes 2 to look the same.
@@ -198,8 +228,6 @@ const SPRITES: Record<SpriteKind, { src: string; depthPx: number }> = {
   marks_ribbon: { src: "/projects/cobblemon-mods/marks-ribbon.png", depthPx: 2 },
   // The ShinyDex mod's own Shiny Charm.
   shiny_charm: { src: "/projects/cobblemon-mods/shiny-charm.png", depthPx: 1 },
-  // Cobblemon's Rare Candy (textures/item/experience_candy).
-  rare_candy: { src: `${COBBLEMON}rare_candy.png`, depthPx: 1 },
 };
 const SPRITE_KINDS = Object.keys(SPRITES) as SpriteKind[];
 const isSprite = (kind: ItemKind): kind is SpriteKind => kind in SPRITES;

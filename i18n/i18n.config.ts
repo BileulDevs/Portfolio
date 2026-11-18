@@ -385,13 +385,13 @@ const en = {
         "Stay fast on the server side in multiplayer",
       ],
       features: [
-        "Cobblemon Ultra-Beasts: a wormhole into Ultra Space, a dimension built to hunt every Ultra Beast",
-        "Cobblemon Scoremons: scoreboard-ready trainer stats, plus server-wide shiny and legendary catch announcements",
-        "Cobblemon ShinyDex: complete the National Dex to earn the Shiny Charm, with advancements and admin commands",
         "Just Enough Cobblemon: a spawn tab in the Pokédex (biome, time, weather, rarity) and every drop table in JEI",
         "Cobblemon Safari: a daily-changing Safari island with timed hunts, missions, events and a shop",
+        "Cobblemon Scoremons: scoreboard-ready trainer stats, plus server-wide shiny and legendary catch announcements",
+        "Cobblemon ShinyDex: complete the National Dex to earn the Shiny Charm, with advancements and admin commands",
         "Cobblemon Marks Quests: marks earned through objectives instead of luck, every condition configurable in JSON",
         "Cobblemon Spawner: a Pokémon spawner block for adventure maps, set up from a 3D interface",
+        "Cobblemon Ultra-Beasts: a wormhole into Ultra Space, a dimension built to hunt every Ultra Beast",
       ],
       architecture: {
         summary: "Java projects built with Gradle that add content on top of Cobblemon, itself a Minecraft mod: items, entities, a dimension and spawn data, released for each supported game version on CurseForge and Modrinth.",
@@ -807,13 +807,13 @@ const fr: typeof en = {
         "Rester performant côté serveur en multijoueur",
       ],
       features: [
-        "Cobblemon Ultra-Beasts : un trou de ver vers l'Ultra-Space, une dimension pensée pour chasser toutes les Ultra-Chimères",
-        "Cobblemon Scoremons : des statistiques de dresseur prêtes pour les scoreboards, et l'annonce des captures shiny et légendaires",
-        "Cobblemon ShinyDex : compléter le Pokédex National pour obtenir le Charme Chroma, avec progrès et commandes d'administration",
         "Just Enough Cobblemon : un onglet d'apparition dans le Pokédex (biome, heure, météo, rareté) et toutes les tables de drop dans JEI",
         "Cobblemon Safari : une île Safari qui change chaque jour, avec chasses chronométrées, missions, événements et boutique",
+        "Cobblemon Scoremons : des statistiques de dresseur prêtes pour les scoreboards, et l'annonce des captures shiny et légendaires",
+        "Cobblemon ShinyDex : compléter le Pokédex National pour obtenir le Charme Chroma, avec progrès et commandes d'administration",
         "Cobblemon Marks Quests : des marques obtenues par objectifs plutôt que par chance, chaque condition configurable en JSON",
         "Cobblemon Spawner : un bloc spawner de Pokémon pour les maps d'aventure, réglé depuis une interface 3D",
+        "Cobblemon Ultra-Beasts : un trou de ver vers l'Ultra-Space, une dimension pensée pour chasser toutes les Ultra-Chimères",
       ],
       architecture: {
         summary: "Des projets Java construits avec Gradle qui ajoutent du contenu à Cobblemon, lui-même un mod Minecraft : objets, entités, une dimension et des données d'apparition, publiés pour chaque version du jeu supportée sur CurseForge et Modrinth.",
