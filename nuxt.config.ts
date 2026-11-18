@@ -30,6 +30,10 @@ export default defineNuxtConfig({
     "@fontsource-variable/jetbrains-mono",
     "~/styles/themes/noxtys.css",
     "~/styles/themes/azure.css",
+    "@fontsource/space-mono/400.css",
+    "@fontsource/space-mono/700.css",
+    "@fontsource-variable/inter",
+    "~/styles/themes/cosmos.css",
   ],
   app: {
     // Name and mode match the .page-* classes in main.css and PAGE_TRANSITION_MS in router.options.ts.

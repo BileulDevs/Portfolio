@@ -75,10 +75,10 @@ export interface Metric {
 }
 
 /** Scene painted as a project's artwork (carousel panel, cover) until real screenshots exist. */
-export type ArtStyle = "night" | "office" | "blocks" | "space";
+export type ArtStyle = "night" | "office" | "blocks" | "space" | "blackhole";
 
 /** Visual theme of a case study (styles in src/styles/themes/). Absent = the site's own look. */
-export type ProjectTheme = "minecraft" | "noxtys" | "azure";
+export type ProjectTheme = "minecraft" | "noxtys" | "azure" | "cosmos";
 
 export interface ProjectData {
   slug: string;

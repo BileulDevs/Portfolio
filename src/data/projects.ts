@@ -23,6 +23,15 @@ export const projects: ProjectData[] = [
     repo: "https://github.com/BileulDevs/observatory",
   },
   {
+    slug: "space-journey",
+    stack: ["Nuxt 4", "Vue 3", "TypeScript", "Three.js", "GLSL", "GSAP", "Lenis", "Web Audio API"],
+    art: "blackhole",
+    theme: "cosmos",
+    url: "https://outer-space-journey.netlify.app/",
+    urlLabel: "outer-space-journey.netlify.app",
+    repo: "https://github.com/BileulDevs/Space-Journey",
+  },
+  {
     slug: "athlon",
     stack: ["Node.js", "C# / .NET", "Vue.js", "Azure", "Azure DevOps", "CI/CD", "Winston"],
     art: "office",

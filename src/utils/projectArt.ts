@@ -302,6 +302,90 @@ const PAINTERS: Record<ArtStyle, Painter> = {
     }
   },
 
+  // Space Journey: a black hole in the site's palette, on the right (clear of the title): the flat
+  // accretion disc, brighter on its approaching (left) side, its far side lensed over the top and
+  // under the bottom of the horizon, and the thin photon ring.
+  blackhole(g, w, h, rnd) {
+    const u = w / 1600;
+    const sky = g.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0, "#05070d");
+    sky.addColorStop(1, "#090d16");
+    g.fillStyle = sky;
+    g.fillRect(0, 0, w, h);
+    for (const [x, y, r, color] of [[0.15, 0.1, 0.5, "rgba(118,199,255,.1)"], [0.7, 0.46, 0.4, "rgba(240,160,98,.12)"]] as const) {
+      const glow = g.createRadialGradient(w * x, h * y, 0, w * x, h * y, w * r);
+      glow.addColorStop(0, color);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = glow;
+      g.fillRect(0, 0, w, h);
+    }
+    for (let k = 0; k < 460; k++) {
+      const big = rnd() > 0.95;
+      const tone = rnd();
+      g.fillStyle = tone > 0.92 ? `rgba(240,160,98,${0.4 + rnd() * 0.5})` : tone > 0.8 ? `rgba(169,220,255,${0.4 + rnd() * 0.5})` : `rgba(216,226,238,${0.2 + rnd() * 0.8})`;
+      g.beginPath();
+      g.arc(rnd() * w, rnd() * h, (big ? 1.4 + rnd() * 1.3 : 0.5 + rnd() * 0.8) * u, 0, Math.PI * 2);
+      g.fill();
+    }
+
+    const cx = w * 0.68, cy = h * 0.46, R = h * 0.15, tilt = -0.1;
+    /** Gas colour at a distance from the centre (f in horizon radii): white-blue, then ember, then red. */
+    const gas = (f: number, a: number) => {
+      const t = Math.min(1, (f - 1.2) / 2.2);
+      const r = Math.round(255 - t * 30), gr = Math.round(236 - t * 150), b = Math.round(214 - t * 170);
+      return `rgba(${r},${gr},${b},${a})`;
+    };
+    /** Distances from `from` to `to` (in horizon radii), close enough for the strokes to blend into one haze. */
+    const span = (from: number, to: number, step: number) => Array.from({ length: Math.round((to - from) / step) + 1 }, (_, i) => from + i * step);
+    /**
+     * Rings of gas on an ellipse around the hole, between two angles; brighter on the left (Doppler)
+     * and fading outward. Drawn additively: `gain` keeps the overlapping strokes from burning out.
+     */
+    const rings = (from: number, to: number, rx: number, ry: number, fs: number[], width: number, gain: number) => {
+      for (const f of fs) {
+        const a = gain * (1 - (f - fs[0]) / (fs[fs.length - 1] - fs[0] + 0.3));
+        const side = g.createLinearGradient(cx - rx * f, 0, cx + rx * f, 0);
+        side.addColorStop(0, gas(f, Math.min(1, a * 1.35)));
+        side.addColorStop(1, gas(f, a * 0.35));
+        g.strokeStyle = side;
+        g.lineWidth = width;
+        g.beginPath();
+        g.ellipse(cx, cy, rx * f, ry * f, tilt, from, to);
+        g.stroke();
+      }
+    };
+    const DISC = span(1.25, 3.6, 0.07);
+    // A warm halo around the hole.
+    const halo = g.createRadialGradient(cx, cy, R, cx, cy, R * 3.2);
+    halo.addColorStop(0, "rgba(240,160,98,.28)");
+    halo.addColorStop(1, "rgba(240,160,98,0)");
+    g.fillStyle = halo;
+    g.fillRect(0, 0, w, h);
+    g.globalCompositeOperation = "lighter";
+    // Far half of the flat disc, behind the hole.
+    rings(Math.PI, Math.PI * 2, R, R * 0.16, DISC, R * 0.12, 0.32);
+    // The far side again, lensed: a band arching over the top of the horizon, and a thinner one under it.
+    rings(Math.PI * 1.02, Math.PI * 1.98, R * 1.02, R, span(1.1, 1.6, 0.035), R * 0.06, 0.3);
+    rings(Math.PI * 0.08, Math.PI * 0.92, R * 1.02, R, span(1.08, 1.22, 0.035), R * 0.04, 0.3);
+    g.globalCompositeOperation = "source-over";
+
+    // The horizon: pure black, edged by the photon ring.
+    g.fillStyle = "#000";
+    g.beginPath();
+    g.arc(cx, cy, R, 0, Math.PI * 2);
+    g.fill();
+    g.strokeStyle = "rgba(255,236,214,.85)";
+    g.lineWidth = 2.2 * u;
+    g.beginPath();
+    g.arc(cx, cy, R * 1.04, 0, Math.PI * 2);
+    g.stroke();
+
+    // Near half of the disc, in front of the hole.
+    g.globalCompositeOperation = "lighter";
+    rings(0, Math.PI, R, R * 0.16, DISC, R * 0.12, 0.32);
+    g.globalCompositeOperation = "source-over";
+  },
+
   // Minecraft mods: a blocky landscape: sky, square sun, block clouds, grass / dirt / stone, a tree.
   blocks(g, w, h, rnd, o) {
     // On covers the sky (and its clouds) is a CSS layer behind the picture.

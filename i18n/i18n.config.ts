@@ -308,6 +308,66 @@ const en = {
         { value: "3", label: "GPU quality tiers" },
       ],
     },
+    "space-journey": {
+      name: "Space Journey",
+      kind: "Interactive 3D · WebGL",
+      period: "2026",
+      status: "Personal project, live",
+      tagline: "A scroll-driven journey from Earth orbit to a new galaxy, rendered live in WebGL.",
+      role: "Solo: design, 3D engine, shaders and sound",
+      context: "A cinematic space voyage told in one continuous camera move: scrolling flies from low Earth orbit through the Solar System, a nebula and a wormhole, past exoplanets, an asteroid field and a black hole, to a new galaxy.",
+      goals: [
+        "Make scrolling feel like piloting a camera, not reading a page",
+        "Stay smooth on phones as well as on desktops",
+        "Ship no image or sound file: everything generated in code",
+      ],
+      features: [
+        "Eight scroll-driven chapters, with a mission HUD to jump to any of them",
+        "Procedural planets: continents, gas bands, craters, lava, clouds and city lights, no texture",
+        "A black hole with an accretion disc (temperature gradient, Doppler brightening) and a photon ring",
+        "A wormhole warp: wider field of view, camera shake, radial streaks and a synthesized sound that rises with it",
+      ],
+      architecture: {
+        summary: "A Nuxt page renders the chapters as plain HTML sections; a client-only component starts a standalone Three.js engine behind them. Scrolling drives a GSAP timeline that moves the camera from station to station, and the engine draws the scene through a bloom, FXAA and film-grain chain.",
+        decisions: [
+          {
+            choice: "Scroll and 3D share one plain object",
+            why: "GSAP animates a plain JavaScript camera object and the engine reads it every frame; Vue reactivity is kept for the HUD only, so nothing reactive runs inside the render loop.",
+          },
+          {
+            choice: "A camera timeline measured on the page",
+            why: "Each station is reached when its section is read, from positions measured in the DOM, through travelling waypoints; frame-rate independent smoothing and banking in turns give the piloted feel.",
+          },
+          {
+            choice: "Everything procedural",
+            why: "Planets, nebula, galaxy and black hole are noise-based shaders, and the soundtrack is synthesized with the Web Audio API: the site downloads code only.",
+          },
+          {
+            choice: "One loop for scroll and animation",
+            why: "Lenis is driven from GSAP's ticker instead of its own requestAnimationFrame, and Three.js ships in its own chunk.",
+          },
+        ],
+      },
+      challenges: [
+        {
+          problem: "Bloom on a multisampled float target flickered depending on the GPU.",
+          solution: "A single-sample half-float render target, with anti-aliasing moved to an FXAA pass.",
+        },
+        {
+          problem: "In development, Three.js add-ons loaded a second copy of Three.js and the canvas stayed blank.",
+          solution: "Three.js and its add-ons forced through the same Vite pre-bundle.",
+        },
+        {
+          problem: "One experience for high-end desktops and modest phones.",
+          solution: "Three quality tiers picked from the device (stars, asteroids, sphere detail, bloom, pixel ratio).",
+        },
+      ],
+      results: [
+        { value: "8", label: "chapters in one camera move" },
+        { value: "0", label: "image or audio files" },
+        { value: "1", label: "draw call for the asteroid field" },
+      ],
+    },
     athlon: {
       name: "Athlon Car Lease",
       kind: "Business apps · Cloud",
@@ -768,6 +828,66 @@ const fr: typeof en = {
         { value: "5", label: "systèmes planétaires réels" },
         { value: "19", label: "modules de shaders GLSL" },
         { value: "3", label: "niveaux de qualité GPU" },
+      ],
+    },
+    "space-journey": {
+      name: "Space Journey",
+      kind: "3D interactive · WebGL",
+      period: "2026",
+      status: "Projet perso, en ligne",
+      tagline: "Un voyage piloté au scroll, de l'orbite terrestre à une nouvelle galaxie, rendu en direct en WebGL.",
+      role: "Seul : design, moteur 3D, shaders et son",
+      context: "Un voyage spatial cinématique raconté en un seul mouvement de caméra : le scroll fait passer de l'orbite basse au Système solaire, à une nébuleuse et un trou de ver, puis devant des exoplanètes, un champ d'astéroïdes et un trou noir, jusqu'à une nouvelle galaxie.",
+      goals: [
+        "Que scroller donne l'impression de piloter une caméra, pas de lire une page",
+        "Rester fluide sur téléphone comme sur ordinateur",
+        "Aucun fichier image ni son : tout est généré par le code",
+      ],
+      features: [
+        "Huit chapitres pilotés au scroll, avec un HUD de mission pour aller à chacun",
+        "Planètes procédurales : continents, bandes gazeuses, cratères, lave, nuages et lumières des villes, sans texture",
+        "Un trou noir avec disque d'accrétion (gradient de température, effet Doppler) et anneau de photons",
+        "Le passage du trou de ver : champ de vision élargi, tremblement, stries radiales et un son synthétisé qui monte avec",
+      ],
+      architecture: {
+        summary: "Une page Nuxt affiche les chapitres en simples sections HTML ; un composant client démarre derrière elles un moteur Three.js autonome. Le scroll pilote une timeline GSAP qui déplace la caméra de station en station, et le moteur dessine la scène à travers une chaîne bloom, FXAA et grain de film.",
+        decisions: [
+          {
+            choice: "Le scroll et la 3D partagent un simple objet",
+            why: "GSAP anime un objet caméra en JavaScript simple que le moteur lit à chaque frame ; la réactivité Vue est réservée au HUD, rien de réactif ne tourne dans la boucle de rendu.",
+          },
+          {
+            choice: "Une timeline caméra mesurée sur la page",
+            why: "Chaque station est atteinte quand sa section est lue, d'après les positions mesurées dans le DOM, en passant par des points de travelling ; un lissage indépendant du framerate et une inclinaison dans les virages donnent la sensation de pilotage.",
+          },
+          {
+            choice: "Tout en procédural",
+            why: "Planètes, nébuleuse, galaxie et trou noir sont des shaders à base de bruit, et la bande-son est synthétisée avec la Web Audio API : le site ne télécharge que du code.",
+          },
+          {
+            choice: "Une seule boucle pour le scroll et l'animation",
+            why: "Lenis est piloté par le ticker de GSAP plutôt que par son propre requestAnimationFrame, et Three.js est servi dans son propre chunk.",
+          },
+        ],
+      },
+      challenges: [
+        {
+          problem: "Le bloom sur une cible flottante multi-échantillonnée scintillait selon le GPU.",
+          solution: "Une cible de rendu demi-flottante mono-échantillon, et l'anti-aliasing confié à une passe FXAA.",
+        },
+        {
+          problem: "En développement, les add-ons de Three.js chargeaient une deuxième copie de Three.js et le canvas restait vide.",
+          solution: "Three.js et ses add-ons forcés dans le même pré-bundle Vite.",
+        },
+        {
+          problem: "Une même expérience pour des ordinateurs puissants et des téléphones modestes.",
+          solution: "Trois paliers de qualité choisis selon l'appareil (étoiles, astéroïdes, détail des sphères, bloom, densité de pixels).",
+        },
+      ],
+      results: [
+        { value: "8", label: "chapitres en un seul mouvement de caméra" },
+        { value: "0", label: "fichier image ou audio" },
+        { value: "1", label: "draw call pour le champ d'astéroïdes" },
       ],
     },
     athlon: {
