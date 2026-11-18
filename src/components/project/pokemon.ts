@@ -49,8 +49,9 @@ export const SPECIES: Record<Companion, Species> = {
   pikachu: {
     files: files("pikachu", "pikachu_male", "pikachu"),
     baseScale: 0.5,
-    // Emote eyes, sparking cheeks and teeth; the open mouth stays (the cry brings it forward).
-    hide: /^(acting_teeth|eye_emote_|eyeshine_(right|left)2|eyelid_emote_|cheek_active_)/,
+    // Emote eyelids, back eye shines, sparking cheeks and teeth; the open mouth stays (the cry brings it
+    // forward). The eye_emote_* pieces are kept: despite their name, they are the top row of the 2×2 eyes.
+    hide: /^(acting_teeth|eyeshine_(right|left)2|eyelid_emote_|cheek_active_)/,
     anim: anims("pikachu", { cry: "animation.pikachu.cry" }),
     cry: cry("pikachu", 0.5),
     speed: 0.55,

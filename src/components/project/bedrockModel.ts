@@ -90,21 +90,29 @@ function vec3(values: (number | string)[]): Vec3Fn {
   const parts = values.map((v) => (typeof v === "number" ? () => v : compileMolang(v)));
   return (t) => [parts[0]?.(t) ?? 0, parts[1]?.(t) ?? 0, parts[2]?.(t) ?? 0];
 }
-/** A channel as a function of time: a constant/Molang triple, or keyframes interpolated linearly. */
+/**
+ * A channel as a function of time: a constant/Molang triple, or keyframes interpolated linearly.
+ * A keyframe may hold two values, as in Bedrock: `pre`, reached when arriving at it, and `post`, left
+ * from; the motion eases from one keyframe's `post` to the next one's `pre`, then jumps (a blink).
+ */
 function channel(c: Channel): Vec3Fn {
   if (Array.isArray(c)) return vec3(c);
   const keys = Object.entries(c)
-    .map(([time, v]) => ({ time: Number(time), at: vec3(Array.isArray(v) ? v : (v.post ?? v.pre ?? [0, 0, 0])) }))
+    .map(([time, v]) => {
+      const pre = Array.isArray(v) ? v : (v.pre ?? v.post ?? [0, 0, 0]);
+      const post = Array.isArray(v) ? v : (v.post ?? v.pre ?? [0, 0, 0]);
+      return { time: Number(time), pre: vec3(pre), post: vec3(post) };
+    })
     .sort((a, b) => a.time - b.time);
   return (t) => {
-    if (t <= keys[0].time) return keys[0].at(t);
+    if (t <= keys[0].time) return keys[0].post(t);
     for (let k = 1; k < keys.length; k++) {
       if (t > keys[k].time) continue;
       const a = keys[k - 1], b = keys[k], u = (t - a.time) / (b.time - a.time);
-      const va = a.at(t), vb = b.at(t);
+      const va = a.post(t), vb = b.pre(t);
       return [va[0] + (vb[0] - va[0]) * u, va[1] + (vb[1] - va[1]) * u, va[2] + (vb[2] - va[2]) * u];
     }
-    return keys[keys.length - 1].at(t);
+    return keys[keys.length - 1].post(t);
   };
 }
 
