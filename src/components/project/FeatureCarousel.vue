@@ -53,15 +53,17 @@ const canvas = ref<HTMLCanvasElement | null>(null);
 const detailCanvas = ref<HTMLCanvasElement | null>(null);
 /** Sound of the open feature's scene (a Pokémon's cry), remembered in this browser. */
 const SOUND_KEY = "portfolio.sound";
+/** Volume before the visitor sets one: low, the cries play as soon as a feature opens. */
+const DEFAULT_LEVEL = 0.1;
 function loadSound(): SoundSettings {
   try {
     const saved = JSON.parse(localStorage.getItem(SOUND_KEY) ?? "null") as Partial<SoundSettings> | null;
-    return { on: saved?.on ?? true, level: typeof saved?.level === "number" ? Math.min(1, Math.max(0, saved.level)) : 0.7 };
+    return { on: saved?.on ?? true, level: typeof saved?.level === "number" ? Math.min(1, Math.max(0, saved.level)) : DEFAULT_LEVEL };
   } catch {
-    return { on: true, level: 0.7 }; // storage unavailable (private mode…): defaults for this visit
+    return { on: true, level: DEFAULT_LEVEL }; // storage unavailable (private mode…): defaults for this visit
   }
 }
-const sound = ref<SoundSettings>({ on: true, level: 0.7 });
+const sound = ref<SoundSettings>({ on: true, level: DEFAULT_LEVEL });
 watch(sound, (next) => {
   detailScene?.setSound(next);
   try {
