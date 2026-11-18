@@ -37,13 +37,13 @@ export const projects: ProjectData[] = [
     urlLabel: "CurseForge",
     // One item per published mod, in the same order as the texts' `features`.
     featureItems: [
-      { model: "poke_ball", companions: ["pikachu"], links: [{ name: "Just Enough Cobblemon", logo: "/projects/cobblemon-mods/logos/just-enough-cobblemon.png", url: "https://www.curseforge.com/minecraft/mc-mods/just-enough-cobblemon" }] },
-      { model: "safari_ball", companions: ["chansey", "tauros", "kangaskhan"], links: [{ name: "Cobblemon Safari", logo: "/projects/cobblemon-mods/logos/safari.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-safari" }] },
-      { model: "command", links: [{ name: "Cobblemon Scoremons", logo: "/projects/cobblemon-mods/logos/scoremons.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-scoremons" }] },
-      { model: "shiny_charm", links: [{ name: "Cobblemon ShinyDex", logo: "/projects/cobblemon-mods/logos/shiny-dex.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-shiny-dex" }] },
-      { model: "marks_ribbon", links: [{ name: "Cobblemon Marks Quests", logo: "/projects/cobblemon-mods/logos/cobblemon-marks.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-marks-quests" }] },
-      { model: "spawner", links: [{ name: "Cobblemon Spawner", logo: "/projects/cobblemon-mods/logos/spawner.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-spawner" }] },
-      { model: "beast_ball", companions: ["poipole"], links: [{ name: "Cobblemon Ultra-Beasts", logo: "/projects/cobblemon-mods/logos/ultra-beasts.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-ultra-beasts" }] },
+      { model: "poke_ball", companions: ["pikachu"], links: [{ name: "Just Enough Cobblemon", logo: "/projects/cobblemon-mods/logos/just-enough-cobblemon.png", url: "https://www.curseforge.com/minecraft/mc-mods/just-enough-cobblemon", repo: "https://github.com/BileulDevs/JustEnoughCobblemon" }] },
+      { model: "safari_ball", companions: ["chansey", "tauros", "kangaskhan"], links: [{ name: "Cobblemon Safari", logo: "/projects/cobblemon-mods/logos/safari.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-safari", repo: "https://github.com/BileulDevs/Cobblemon-Safari" }] },
+      { model: "command", links: [{ name: "Cobblemon Scoremons", logo: "/projects/cobblemon-mods/logos/scoremons.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-scoremons", repo: "https://github.com/BileulDevs/Cobblemon-Scoremons" }] },
+      { model: "shiny_charm", links: [{ name: "Cobblemon ShinyDex", logo: "/projects/cobblemon-mods/logos/shiny-dex.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-shiny-dex", repo: "https://github.com/BileulDevs/Cobblemon-ShinyDex" }] },
+      { model: "marks_ribbon", links: [{ name: "Cobblemon Marks Quests", logo: "/projects/cobblemon-mods/logos/cobblemon-marks.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-marks-quests", repo: "https://github.com/BileulDevs/Cobblemon-Marks" }] },
+      { model: "spawner", links: [{ name: "Cobblemon Spawner", logo: "/projects/cobblemon-mods/logos/spawner.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-spawner", repo: "https://github.com/BileulDevs/Cobblemon-Spawner" }] },
+      { model: "beast_ball", companions: ["poipole"], links: [{ name: "Cobblemon Ultra-Beasts", logo: "/projects/cobblemon-mods/logos/ultra-beasts.png", url: "https://www.curseforge.com/minecraft/mc-mods/cobblemon-ultra-beasts", repo: "https://github.com/BileulDevs/Cobblemon-Ultra-Beasts" }] },
     ],
   },
 ];

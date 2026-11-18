@@ -46,6 +46,8 @@ export interface FeatureLink {
   /** Path under /public. */
   logo: string;
   url: string;
+  /** The mod's source code on GitHub, shown as a second line under its CurseForge page. */
+  repo?: string;
 }
 
 /** One feature shown as a 3D item (feature carousel): its texts, model and published pages. */

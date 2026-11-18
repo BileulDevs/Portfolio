@@ -418,11 +418,7 @@ onBeforeUnmount(() => {
             <div class="text">
               <h3>{{ current.title }}</h3>
               <p v-if="current.body">{{ current.body }}</p>
-              <ul class="links">
-                <li v-for="m in current.links" :key="m.url">
-                  <a :href="m.url" target="_blank" rel="noopener noreferrer"><img :src="m.logo" alt="" width="28" height="28" loading="lazy" />{{ m.name }} · CurseForge ↗</a>
-                </li>
-              </ul>
+              <FeatureLinks :links="current.links" />
               <button type="button" class="back" @click="close">← {{ label }}</button>
             </div>
           </div>
@@ -445,11 +441,7 @@ onBeforeUnmount(() => {
         <div class="text">
           <h3>{{ item.title }}</h3>
           <p v-if="item.body">{{ item.body }}</p>
-          <ul class="links">
-            <li v-for="m in item.links" :key="m.url">
-              <a :href="m.url" target="_blank" rel="noopener noreferrer"><img :src="m.logo" alt="" width="28" height="28" loading="lazy" />{{ m.name }} · CurseForge ↗</a>
-            </li>
-          </ul>
+          <FeatureLinks :links="item.links" />
         </div>
       </li>
     </ul>
@@ -485,9 +477,6 @@ onBeforeUnmount(() => {
 .text { display: grid; gap: 12px; }
 .text h3 { margin: 0; font-size: clamp(22px, 2.2vw, 30px); letter-spacing: -.02em; }
 .text p { margin: 0; font-size: 16px; line-height: 1.55; max-width: 46ch; }
-.links { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
-.links a { display: inline-flex; align-items: center; gap: 10px; color: var(--coral); font-size: 14.5px; }
-.links img { width: 28px; height: 28px; border-radius: 4px; }
 .back { justify-self: start; margin-top: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; opacity: .7; cursor: pointer; }
 .back:hover { opacity: 1; }
 .detail-enter-active { transition: opacity .45s ease .1s; }
