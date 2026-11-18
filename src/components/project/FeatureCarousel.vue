@@ -80,6 +80,53 @@ const active = ref(0);
 const open = ref(false);
 /** The details are on screen, closing fade included: the stage keeps their height until they are gone. */
 const expanded = ref(false);
+/** How long the stage takes to grow to the details' height, or back to the ring's (see .sliding). */
+const SLIDE_MS = 450;
+let slideTimer = 0;
+let collapseTimer = 0;
+let slideEnds = 0;
+/**
+ * Animates the stage's height between two values instead of letting it jump, which would shift the
+ * page below. Only the stage's box moves: the details inside keep their final size (clipped while it
+ * slides) and the ring's canvas keeps its own, so neither WebGL canvas is resized on the way.
+ */
+function slideStage(from: number, to: number, clear: boolean) {
+  const el = stage.value;
+  if (!el || from === to) return;
+  window.clearTimeout(slideTimer);
+  el.style.height = `${from}px`;
+  void el.offsetHeight; // commit the start height before the transition
+  el.classList.add("sliding");
+  el.style.height = `${to}px`;
+  slideEnds = performance.now() + SLIDE_MS;
+  slideTimer = window.setTimeout(() => {
+    el.classList.remove("sliding");
+    if (clear) el.style.height = "";
+  }, SLIDE_MS);
+}
+/** Details entering: the stage grows from the ring's height to theirs. */
+async function onDetailEnter() {
+  window.clearTimeout(collapseTimer);
+  const el = stage.value;
+  const from = el?.offsetHeight ?? 0;
+  expanded.value = true;
+  await nextTick();
+  if (!el) return;
+  el.style.height = "";
+  slideStage(from, el.offsetHeight, true);
+}
+/** Details leaving: the stage shrinks back to the ring's height while they fade. */
+function onDetailLeave() {
+  const el = stage.value;
+  if (el && canvas.value) slideStage(el.offsetHeight, canvas.value.offsetHeight, false);
+}
+/** Details gone: back to the ring's layout once the stage has finished shrinking. */
+function onDetailGone() {
+  collapseTimer = window.setTimeout(() => {
+    expanded.value = false;
+    if (stage.value) stage.value.style.height = "";
+  }, Math.max(0, slideEnds - performance.now()));
+}
 const inView = useInView(root, "100px");
 const count = computed(() => props.items.length);
 const current = computed(() => props.items[active.value]);
@@ -209,14 +256,15 @@ async function initWebGL(T: Parts, items: typeof import("./blockItems")) {
   }
   disposeScene = () => factory.dispose();
   resizeObserver = new ResizeObserver(resize);
-  resizeObserver.observe(stage.value!);
+  // The canvas, not the stage: the stage grows with the open details, the ring's canvas keeps its size.
+  resizeObserver.observe(canvas.value!);
   resize();
 }
 
 /** Frames the whole ring (on narrow screens, mostly the front block), seen from slightly above. */
 function resize() {
-  if (!renderer || !camera || !stage.value) return;
-  const w = stage.value.clientWidth, h = stage.value.clientHeight;
+  if (!renderer || !camera || !canvas.value) return;
+  const w = canvas.value.clientWidth, h = canvas.value.clientHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   const tan = Math.tan((camera.fov * Math.PI) / 360);
@@ -368,6 +416,8 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   cancelAnimationFrame(raf);
   clearTimeout(wheelTimer);
+  clearTimeout(slideTimer);
+  clearTimeout(collapseTimer);
   stage.value?.removeEventListener("wheel", onWheel);
   resizeObserver?.disconnect();
   disposeScene?.();
@@ -398,7 +448,7 @@ onBeforeUnmount(() => {
       >
         <canvas ref="canvas" aria-hidden="true" />
 
-        <Transition name="detail" @before-enter="expanded = true" @after-leave="expanded = false">
+        <Transition name="detail" @before-enter="onDetailEnter" @before-leave="onDetailLeave" @after-leave="onDetailGone">
           <div v-if="open" class="detail" role="dialog" :aria-label="current.title" @keydown.stop="onKey">
             <div v-if="current.companions?.length" class="scene-wrap">
               <canvas ref="sceneCanvas" class="scene" aria-hidden="true" />
@@ -460,16 +510,18 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.fc { position: relative; }
-.stage { position: relative; height: clamp(260px, 38vh, 400px); outline-offset: -4px; touch-action: pan-y; user-select: none; cursor: grab; }
+/* --stage-h: the ring's height. Its canvas always keeps it, even while the open details make the stage taller. */
+.fc { position: relative; --stage-h: clamp(260px, 38vh, 400px); }
+.stage { position: relative; height: var(--stage-h); outline-offset: -4px; touch-action: pan-y; user-select: none; cursor: grab; }
 .stage:active { cursor: grabbing; }
-.stage > canvas { width: 100%; height: 100%; display: block; transition: opacity .35s ease; }
+.stage > canvas { position: absolute; top: 0; left: 0; width: 100%; height: var(--stage-h); display: block; transition: opacity .35s ease; }
 .open .stage > canvas { opacity: 0; }
-/* Open: the stage grows with the details (the carousel canvas, hidden, stays behind). */
+/* Open: the stage takes the details' height; the hidden ring's canvas stays at its own, behind. */
 .open .stage { cursor: auto; }
-.expanded .stage { height: auto; min-height: clamp(340px, 46vh, 460px); display: grid; }
-.expanded .stage > canvas { position: absolute; inset: 0; }
-.expanded .detail { position: relative; inset: auto; padding: 16px 0; }
+.expanded .stage { height: auto; }
+.expanded .detail { position: relative; inset: auto; min-height: clamp(340px, 46vh, 460px); padding: 16px 0; }
+/* Growing or shrinking between the two (see slideStage): the details keep their size, clipped meanwhile. */
+.stage.sliding { overflow: hidden; transition: height .45s var(--ease); }
 
 /* Detail: the item on the left, the texts beside it (no frame). */
 .detail { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 2fr) 3fr; align-items: center; gap: clamp(16px, 3vw, 40px); }
