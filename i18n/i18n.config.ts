@@ -8,11 +8,11 @@
 
 const en = {
   meta: {
-    title: "Bilel Sahraoui — Full Stack Developer",
+    title: "Bilel Sahraoui • Full Stack Developer",
     description: "Bilel Sahraoui, Full Stack Node.js / TypeScript developer. Business applications, SaaS in production, mods with 1.3 million downloads.",
     ogDescription: "Node.js, TypeScript, Vue, Next.js, C# / .NET, Azure. Open to a permanent position.",
-    projectTitle: "{name} — Bilel Sahraoui",
-    notFoundTitle: "Page not found — Bilel Sahraoui",
+    projectTitle: "{name} • Bilel Sahraoui",
+    notFoundTitle: "Page not found • Bilel Sahraoui",
   },
   a11y: {
     skip: "Skip to content",
@@ -534,11 +534,11 @@ const en = {
 
 const fr: typeof en = {
   meta: {
-    title: "Bilel Sahraoui — Développeur Full Stack",
+    title: "Bilel Sahraoui • Développeur Full Stack",
     description: "Bilel Sahraoui, développeur Full Stack Node.js / TypeScript. Applications métier, SaaS en production, mods à 1,3 million de téléchargements.",
     ogDescription: "Node.js, TypeScript, Vue, Next.js, C# / .NET, Azure. Ouvert à un CDI.",
-    projectTitle: "{name} — Bilel Sahraoui",
-    notFoundTitle: "Page introuvable — Bilel Sahraoui",
+    projectTitle: "{name} • Bilel Sahraoui",
+    notFoundTitle: "Page introuvable • Bilel Sahraoui",
   },
   a11y: {
     skip: "Aller au contenu",
