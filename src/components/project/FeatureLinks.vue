@@ -31,6 +31,8 @@ defineProps<{ links: FeatureLink[] }>();
 
 <style scoped>
 .links { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
-.links a { display: inline-flex; align-items: center; gap: 10px; color: var(--coral); font-size: 14.5px; }
+.links a { display: inline-flex; align-items: center; gap: 10px; color: var(--coral); font-size: 14.5px; transition: color .2s ease; }
+/* Hover: the theme's link colour, a little darker. */
+.links a:hover { color: color-mix(in srgb, var(--coral), #000 20%); }
 .links img, .links .mark { flex: none; width: 28px; height: 28px; border-radius: 4px; }
 </style>

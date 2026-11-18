@@ -85,3 +85,5 @@
 /* Feature carousel: game-style arrows, white item names with the chat shadow. */
 :root .case[data-theme="minecraft"] .fc .arrow { border: 3px solid #000; background: #8b8b8b; color: #fff; box-shadow: var(--mc-bevel); text-shadow: var(--mc-shadow); }
 :root .case[data-theme="minecraft"] .fc .links a { color: #2a5e10; }
+/* A slightly darker green on hover. */
+:root .case[data-theme="minecraft"] .fc .links a:hover { color: #1d430a; }
