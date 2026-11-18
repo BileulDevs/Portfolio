@@ -53,15 +53,17 @@ const canvas = ref<HTMLCanvasElement | null>(null);
 const detailCanvas = ref<HTMLCanvasElement | null>(null);
 /** Sound of the open feature's scene (a Pokémon's cry), remembered in this browser. */
 const SOUND_KEY = "portfolio.sound";
+/** Volume before the visitor sets one: low, the cries play as soon as a feature opens. */
+const DEFAULT_LEVEL = 0.1;
 function loadSound(): SoundSettings {
   try {
     const saved = JSON.parse(localStorage.getItem(SOUND_KEY) ?? "null") as Partial<SoundSettings> | null;
-    return { on: saved?.on ?? true, level: typeof saved?.level === "number" ? Math.min(1, Math.max(0, saved.level)) : 0.7 };
+    return { on: saved?.on ?? true, level: typeof saved?.level === "number" ? Math.min(1, Math.max(0, saved.level)) : DEFAULT_LEVEL };
   } catch {
-    return { on: true, level: 0.7 }; // storage unavailable (private mode…): defaults for this visit
+    return { on: true, level: DEFAULT_LEVEL }; // storage unavailable (private mode…): defaults for this visit
   }
 }
-const sound = ref<SoundSettings>({ on: true, level: 0.7 });
+const sound = ref<SoundSettings>({ on: true, level: DEFAULT_LEVEL });
 watch(sound, (next) => {
   detailScene?.setSound(next);
   try {
@@ -76,6 +78,8 @@ const listCanvases = ref<HTMLCanvasElement[]>([]);
 const mode = ref<"webgl" | "list">(prefersReducedMotion() ? "list" : "webgl");
 const active = ref(0);
 const open = ref(false);
+/** The details are on screen, closing fade included: the stage keeps their height until they are gone. */
+const expanded = ref(false);
 const inView = useInView(root, "100px");
 const count = computed(() => props.items.length);
 const current = computed(() => props.items[active.value]);
@@ -376,7 +380,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="root" class="fc" :class="[mode, { open }]">
+  <div ref="root" class="fc" :class="[mode, { open, expanded }]">
     <template v-if="mode === 'webgl'">
       <div
         ref="stage"
@@ -394,7 +398,7 @@ onBeforeUnmount(() => {
       >
         <canvas ref="canvas" aria-hidden="true" />
 
-        <Transition name="detail">
+        <Transition name="detail" @before-enter="expanded = true" @after-leave="expanded = false">
           <div v-if="open" class="detail" role="dialog" :aria-label="current.title" @keydown.stop="onKey">
             <div v-if="current.companions?.length" class="scene-wrap">
               <canvas ref="sceneCanvas" class="scene" aria-hidden="true" />
@@ -418,6 +422,8 @@ onBeforeUnmount(() => {
             <div class="text">
               <h3>{{ current.title }}</h3>
               <p v-if="current.body">{{ current.body }}</p>
+              <ul v-if="current.tech?.length" class="tech" :aria-label="$t('case.tech')"><li v-for="t in current.tech" :key="t">{{ t }}</li></ul>
+              <ul v-if="current.details?.length" class="details"><li v-for="d in current.details" :key="d">{{ d }}</li></ul>
               <FeatureLinks :links="current.links" />
               <button type="button" class="back" @click="close">← {{ label }}</button>
             </div>
@@ -441,6 +447,8 @@ onBeforeUnmount(() => {
         <div class="text">
           <h3>{{ item.title }}</h3>
           <p v-if="item.body">{{ item.body }}</p>
+          <ul v-if="item.tech?.length" class="tech" :aria-label="$t('case.tech')"><li v-for="t in item.tech" :key="t">{{ t }}</li></ul>
+          <ul v-if="item.details?.length" class="details"><li v-for="d in item.details" :key="d">{{ d }}</li></ul>
           <FeatureLinks :links="item.links" />
         </div>
       </li>
@@ -457,7 +465,11 @@ onBeforeUnmount(() => {
 .stage:active { cursor: grabbing; }
 .stage > canvas { width: 100%; height: 100%; display: block; transition: opacity .35s ease; }
 .open .stage > canvas { opacity: 0; }
+/* Open: the stage grows with the details (the carousel canvas, hidden, stays behind). */
 .open .stage { cursor: auto; }
+.expanded .stage { height: auto; min-height: clamp(340px, 46vh, 460px); display: grid; }
+.expanded .stage > canvas { position: absolute; inset: 0; }
+.expanded .detail { position: relative; inset: auto; padding: 16px 0; }
 
 /* Detail: the item on the left, the texts beside it (no frame). */
 .detail { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 2fr) 3fr; align-items: center; gap: clamp(16px, 3vw, 40px); }
@@ -477,6 +489,13 @@ onBeforeUnmount(() => {
 .text { display: grid; gap: 12px; }
 .text h3 { margin: 0; font-size: clamp(22px, 2.2vw, 30px); letter-spacing: -.02em; }
 .text p { margin: 0; font-size: 16px; line-height: 1.55; max-width: 46ch; }
+/* Technical details: a compact list, each point marked like the site's other lists. */
+.details { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; max-width: 58ch; font-size: 13.5px; line-height: 1.4; }
+.details li { position: relative; padding-left: 14px; opacity: .85; }
+.details li::before { content: ""; position: absolute; left: 0; top: .5em; width: 5px; height: 5px; background: var(--coral); }
+/* Key techniques: small mono badges, read at a glance. */
+.tech { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.tech li { padding: 2px 8px; border: 1px solid currentColor; border-radius: 4px; font-family: var(--mono); font-size: 11px; letter-spacing: .02em; opacity: .75; }
 .back { justify-self: start; margin-top: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; opacity: .7; cursor: pointer; }
 .back:hover { opacity: 1; }
 .detail-enter-active { transition: opacity .45s ease .1s; }
@@ -504,10 +523,9 @@ onBeforeUnmount(() => {
 .detail.static { position: static; }
 
 @media (max-width: 700px) {
-  .open .stage { height: 460px; }
   .detail { grid-template-columns: 1fr; align-content: center; }
   /* Stacked layout: the scene keeps to its own block above the texts. */
-  .scene-wrap { position: relative; }
+  .scene-wrap { position: relative; height: 260px; }
   .detail .scene { position: static; }
   .detail .item { width: 150px; }
 }

@@ -8,11 +8,11 @@
 
 const en = {
   meta: {
-    title: "Bilel Sahraoui — Full Stack Developer",
+    title: "Bilel Sahraoui • Full Stack Developer",
     description: "Bilel Sahraoui, Full Stack Node.js / TypeScript developer. Business applications, SaaS in production, mods with 1.3 million downloads.",
     ogDescription: "Node.js, TypeScript, Vue, Next.js, C# / .NET, Azure. Open to a permanent position.",
-    projectTitle: "{name} — Bilel Sahraoui",
-    notFoundTitle: "Page not found — Bilel Sahraoui",
+    projectTitle: "{name} • Bilel Sahraoui",
+    notFoundTitle: "Page not found • Bilel Sahraoui",
   },
   a11y: {
     skip: "Skip to content",
@@ -121,6 +121,7 @@ const en = {
     next: "Next project",
     featuresCarousel: "carousel",
     featuresHint: "Click an item to see the details",
+    tech: "Key techniques",
     openFeature: "Show details: {name}",
     prevFeature: "Previous feature",
     nextFeature: "Next feature",
@@ -307,6 +308,66 @@ const en = {
         { value: "3", label: "GPU quality tiers" },
       ],
     },
+    "space-journey": {
+      name: "Space Journey",
+      kind: "Interactive 3D · WebGL",
+      period: "2026",
+      status: "Personal project, live",
+      tagline: "A scroll-driven journey from Earth orbit to a new galaxy, rendered live in WebGL.",
+      role: "Solo: design, 3D engine, shaders and sound",
+      context: "A cinematic space voyage told in one continuous camera move: scrolling flies from low Earth orbit through the Solar System, a nebula and a wormhole, past exoplanets, an asteroid field and a black hole, to a new galaxy.",
+      goals: [
+        "Make scrolling feel like piloting a camera, not reading a page",
+        "Stay smooth on phones as well as on desktops",
+        "Ship no image or sound file: everything generated in code",
+      ],
+      features: [
+        "Eight scroll-driven chapters, with a mission HUD to jump to any of them",
+        "Procedural planets: continents, gas bands, craters, lava, clouds and city lights, no texture",
+        "A black hole with an accretion disc (temperature gradient, Doppler brightening) and a photon ring",
+        "A wormhole warp: wider field of view, camera shake, radial streaks and a synthesized sound that rises with it",
+      ],
+      architecture: {
+        summary: "A Nuxt page renders the chapters as plain HTML sections; a client-only component starts a standalone Three.js engine behind them. Scrolling drives a GSAP timeline that moves the camera from station to station, and the engine draws the scene through a bloom, FXAA and film-grain chain.",
+        decisions: [
+          {
+            choice: "Scroll and 3D share one plain object",
+            why: "GSAP animates a plain JavaScript camera object and the engine reads it every frame; Vue reactivity is kept for the HUD only, so nothing reactive runs inside the render loop.",
+          },
+          {
+            choice: "A camera timeline measured on the page",
+            why: "Each station is reached when its section is read, from positions measured in the DOM, through travelling waypoints; frame-rate independent smoothing and banking in turns give the piloted feel.",
+          },
+          {
+            choice: "Everything procedural",
+            why: "Planets, nebula, galaxy and black hole are noise-based shaders, and the soundtrack is synthesized with the Web Audio API: the site downloads code only.",
+          },
+          {
+            choice: "One loop for scroll and animation",
+            why: "Lenis is driven from GSAP's ticker instead of its own requestAnimationFrame, and Three.js ships in its own chunk.",
+          },
+        ],
+      },
+      challenges: [
+        {
+          problem: "Bloom on a multisampled float target flickered depending on the GPU.",
+          solution: "A single-sample half-float render target, with anti-aliasing moved to an FXAA pass.",
+        },
+        {
+          problem: "In development, Three.js add-ons loaded a second copy of Three.js and the canvas stayed blank.",
+          solution: "Three.js and its add-ons forced through the same Vite pre-bundle.",
+        },
+        {
+          problem: "One experience for high-end desktops and modest phones.",
+          solution: "Three quality tiers picked from the device (stars, asteroids, sphere detail, bloom, pixel ratio).",
+        },
+      ],
+      results: [
+        { value: "8", label: "chapters in one camera move" },
+        { value: "0", label: "image or audio files" },
+        { value: "1", label: "draw call for the asteroid field" },
+      ],
+    },
     athlon: {
       name: "Athlon Car Lease",
       kind: "Business apps · Cloud",
@@ -373,7 +434,7 @@ const en = {
       kind: "Open source · Java",
       /** Replaces the "Features" heading for this project. */
       featuresTitle: "Mods",
-      period: "Ongoing",
+      period: "2024 — Ongoing",
       status: "Published · CurseForge & Modrinth",
       tagline: "Over 1.3 million downloads across Java mods maintained for Fabric and NeoForge.",
       role: "Author and maintainer",
@@ -392,6 +453,44 @@ const en = {
         "Cobblemon Marks Quests: marks earned through objectives instead of luck, every condition configurable in JSON",
         "Cobblemon Spawner: a Pokémon spawner block for adventure maps, set up from a 3D interface",
         "Cobblemon Ultra-Beasts: a wormhole into Ultra Space, a dimension built to hunt every Ultra Beast",
+      ],
+      /** Technical details per mod, in the same order as `features`: shown when a mod is opened. */
+      featureDetails: [
+        [
+          "Pokédex tab added by mixin, out of reach of Cobblemon's casts",
+          "Spawn data sent once on join, cached on the client",
+          "Jade code loaded only by Jade: no crash without it",
+        ],
+        [
+          "Site search off the server thread (CompletableFuture)",
+          "Houses prebuilt by chunk tickets, paused when the server lags",
+          "Live daily reset: the level swapped in a single tick",
+        ],
+        [
+          "Every write through a single StatAwarder",
+          "Lowest-priority listeners, mixins where Cobblemon has no event",
+          "Pokédex stats rebuilt from state, never counted",
+        ],
+        [
+          "Throttling removed 4,000 Pokédex lookups per player per tick",
+          "Species resolved once into an immutable cache",
+          "Shiny boost checked at spawn in two map lookups",
+        ],
+        [
+          "Polymorphic Gson adapter for the JSON conditions",
+          "Progress stored in the Pokémon's own NBT",
+          "Counters synced to the client as they change",
+        ],
+        [
+          "Pokémon tagged with the spawner's position, no UUID tracking",
+          "Weighted draw filtered by time and weather",
+          "Hand-drawn Kotlin screens with animated 3D models",
+        ],
+        [
+          "One-player lease that survives restarts",
+          "Bounding boxes: ~885,000 fewer NBT entries per save",
+          "Structure meshes preloaded before the cinematic",
+        ],
       ],
       architecture: {
         summary: "Java projects built with Gradle that add content on top of Cobblemon, itself a Minecraft mod: items, entities, a dimension and spawn data, released for each supported game version on CurseForge and Modrinth.",
@@ -435,11 +534,11 @@ const en = {
 
 const fr: typeof en = {
   meta: {
-    title: "Bilel Sahraoui — Développeur Full Stack",
+    title: "Bilel Sahraoui • Développeur Full Stack",
     description: "Bilel Sahraoui, développeur Full Stack Node.js / TypeScript. Applications métier, SaaS en production, mods à 1,3 million de téléchargements.",
     ogDescription: "Node.js, TypeScript, Vue, Next.js, C# / .NET, Azure. Ouvert à un CDI.",
-    projectTitle: "{name} — Bilel Sahraoui",
-    notFoundTitle: "Page introuvable — Bilel Sahraoui",
+    projectTitle: "{name} • Bilel Sahraoui",
+    notFoundTitle: "Page introuvable • Bilel Sahraoui",
   },
   a11y: {
     skip: "Aller au contenu",
@@ -547,6 +646,7 @@ const fr: typeof en = {
     next: "Projet suivant",
     featuresCarousel: "carrousel",
     featuresHint: "Clique sur un objet pour voir le détail",
+    tech: "Techniques clés",
     openFeature: "Voir le détail : {name}",
     prevFeature: "Fonctionnalité précédente",
     nextFeature: "Fonctionnalité suivante",
@@ -730,6 +830,66 @@ const fr: typeof en = {
         { value: "3", label: "niveaux de qualité GPU" },
       ],
     },
+    "space-journey": {
+      name: "Space Journey",
+      kind: "3D interactive · WebGL",
+      period: "2026",
+      status: "Projet perso, en ligne",
+      tagline: "Un voyage piloté au scroll, de l'orbite terrestre à une nouvelle galaxie, rendu en direct en WebGL.",
+      role: "Seul : design, moteur 3D, shaders et son",
+      context: "Un voyage spatial cinématique raconté en un seul mouvement de caméra : le scroll fait passer de l'orbite basse au Système solaire, à une nébuleuse et un trou de ver, puis devant des exoplanètes, un champ d'astéroïdes et un trou noir, jusqu'à une nouvelle galaxie.",
+      goals: [
+        "Que scroller donne l'impression de piloter une caméra, pas de lire une page",
+        "Rester fluide sur téléphone comme sur ordinateur",
+        "Aucun fichier image ni son : tout est généré par le code",
+      ],
+      features: [
+        "Huit chapitres pilotés au scroll, avec un HUD de mission pour aller à chacun",
+        "Planètes procédurales : continents, bandes gazeuses, cratères, lave, nuages et lumières des villes, sans texture",
+        "Un trou noir avec disque d'accrétion (gradient de température, effet Doppler) et anneau de photons",
+        "Le passage du trou de ver : champ de vision élargi, tremblement, stries radiales et un son synthétisé qui monte avec",
+      ],
+      architecture: {
+        summary: "Une page Nuxt affiche les chapitres en simples sections HTML ; un composant client démarre derrière elles un moteur Three.js autonome. Le scroll pilote une timeline GSAP qui déplace la caméra de station en station, et le moteur dessine la scène à travers une chaîne bloom, FXAA et grain de film.",
+        decisions: [
+          {
+            choice: "Le scroll et la 3D partagent un simple objet",
+            why: "GSAP anime un objet caméra en JavaScript simple que le moteur lit à chaque frame ; la réactivité Vue est réservée au HUD, rien de réactif ne tourne dans la boucle de rendu.",
+          },
+          {
+            choice: "Une timeline caméra mesurée sur la page",
+            why: "Chaque station est atteinte quand sa section est lue, d'après les positions mesurées dans le DOM, en passant par des points de travelling ; un lissage indépendant du framerate et une inclinaison dans les virages donnent la sensation de pilotage.",
+          },
+          {
+            choice: "Tout en procédural",
+            why: "Planètes, nébuleuse, galaxie et trou noir sont des shaders à base de bruit, et la bande-son est synthétisée avec la Web Audio API : le site ne télécharge que du code.",
+          },
+          {
+            choice: "Une seule boucle pour le scroll et l'animation",
+            why: "Lenis est piloté par le ticker de GSAP plutôt que par son propre requestAnimationFrame, et Three.js est servi dans son propre chunk.",
+          },
+        ],
+      },
+      challenges: [
+        {
+          problem: "Le bloom sur une cible flottante multi-échantillonnée scintillait selon le GPU.",
+          solution: "Une cible de rendu demi-flottante mono-échantillon, et l'anti-aliasing confié à une passe FXAA.",
+        },
+        {
+          problem: "En développement, les add-ons de Three.js chargeaient une deuxième copie de Three.js et le canvas restait vide.",
+          solution: "Three.js et ses add-ons forcés dans le même pré-bundle Vite.",
+        },
+        {
+          problem: "Une même expérience pour des ordinateurs puissants et des téléphones modestes.",
+          solution: "Trois paliers de qualité choisis selon l'appareil (étoiles, astéroïdes, détail des sphères, bloom, densité de pixels).",
+        },
+      ],
+      results: [
+        { value: "8", label: "chapitres en un seul mouvement de caméra" },
+        { value: "0", label: "fichier image ou audio" },
+        { value: "1", label: "draw call pour le champ d'astéroïdes" },
+      ],
+    },
     athlon: {
       name: "Athlon Car Lease",
       kind: "Applications métier · Cloud",
@@ -795,7 +955,7 @@ const fr: typeof en = {
       name: "Mods Minecraft",
       kind: "Open source · Java",
       featuresTitle: "Mods",
-      period: "En continu",
+      period: "2024 — En cours",
       status: "Publiés · CurseForge & Modrinth",
       tagline: "Plus de 1,3 million de téléchargements sur des mods Java maintenus pour Fabric et NeoForge.",
       role: "Auteur et mainteneur",
@@ -814,6 +974,43 @@ const fr: typeof en = {
         "Cobblemon Marks Quests : des marques obtenues par objectifs plutôt que par chance, chaque condition configurable en JSON",
         "Cobblemon Spawner : un bloc spawner de Pokémon pour les maps d'aventure, réglé depuis une interface 3D",
         "Cobblemon Ultra-Beasts : un trou de ver vers l'Ultra-Space, une dimension pensée pour chasser toutes les Ultra-Chimères",
+      ],
+      featureDetails: [
+        [
+          "Onglet Pokédex ajouté par mixin, hors de portée des casts de Cobblemon",
+          "Données d'apparition envoyées une fois à la connexion, en cache côté client",
+          "Code Jade chargé par Jade seul : aucun crash sans lui",
+        ],
+        [
+          "Recherche de sites hors du thread serveur (CompletableFuture)",
+          "Refuges préconstruits par tickets de chunk, en pause si le serveur rame",
+          "Régénération à chaud : le niveau remplacé en un seul tick",
+        ],
+        [
+          "Toutes les écritures passent par un seul StatAwarder",
+          "Écouteurs en priorité minimale, mixins là où Cobblemon n'a pas d'événement",
+          "Stats du Pokédex recalculées depuis l'état, jamais comptées",
+        ],
+        [
+          "Un throttling qui évite 4 000 lectures du Pokédex par joueur et par tick",
+          "Espèces résolues une fois dans un cache immuable",
+          "Bonus shiny vérifié à l'apparition en deux lectures de map",
+        ],
+        [
+          "Adaptateur Gson polymorphe pour les conditions JSON",
+          "Progression stockée dans le NBT du Pokémon",
+          "Compteurs synchronisés au client dès qu'ils changent",
+        ],
+        [
+          "Pokémon marqués avec la position du spawner, sans suivi par UUID",
+          "Tirage pondéré filtré par l'heure et la météo",
+          "Écrans Kotlin dessinés à la main, modèles 3D animés",
+        ],
+        [
+          "Bail « un joueur à la fois » qui survit aux redémarrages",
+          "Boîtes englobantes : ~885 000 entrées NBT en moins par sauvegarde",
+          "Maillages de la structure préchargés avant la cinématique",
+        ],
       ],
       architecture: {
         summary: "Des projets Java construits avec Gradle qui ajoutent du contenu à Cobblemon, lui-même un mod Minecraft : objets, entités, une dimension et des données d'apparition, publiés pour chaque version du jeu supportée sur CurseForge et Modrinth.",

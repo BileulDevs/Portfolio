@@ -1,0 +1,91 @@
+/* ------------------------------------------------------------------
+   Theme "cosmos" — the case study in Space Journey's own design:
+   an indigo-black void, cold starlight text, a warm "ember" accent
+   (stellar dust, accretion disc) and a cold "plasma" blue for HUD
+   readouts; Space Grotesk titles, Inter text, Space Mono telemetry.
+   Blocks are HUD panels framed by corner brackets.
+   Enabled by `theme: "cosmos"` on a project (src/data/projects.ts).
+   Selectors start with `:root .case[data-theme]` to outrank scoped styles.
+   ------------------------------------------------------------------ */
+
+:root .case[data-theme="cosmos"] {
+  /* Space Journey palette, mapped onto the site's tokens. */
+  --lav: #05070d;    /* --void: page background */
+  --ink: #d8e2ee;    /* --text: starlight (15:1) */
+  --base: #090d16;   /* --deep: deeper panels */
+  --slate: #8b9ab0;  /* --text-dim: secondary text (6.9:1) */
+  --mist: #a9dcff;   /* --plasma-soft */
+  --coral: #f0a062;  /* --ember: warm accent */
+  --cs-plasma: #76c7ff;
+  --cs-line: rgba(140, 170, 210, .16);
+  --cs-panel: rgba(10, 14, 22, .55);
+  --display: "Space Grotesk Variable", system-ui, sans-serif;
+  --mono: "Space Mono", ui-monospace, monospace;
+  font-family: "Inter Variable", system-ui, sans-serif;
+  /* Sparse static stars, a cold glow up left and a warm one down right (sun and accretion disc). */
+  background:
+    radial-gradient(1px 1px at 30px 40px, rgba(216, 226, 238, .85), transparent) 0 0 / 210px 210px,
+    radial-gradient(1px 1px at 150px 120px, rgba(169, 220, 255, .6), transparent) 0 0 / 290px 290px,
+    radial-gradient(1.5px 1.5px at 80px 200px, rgba(240, 160, 98, .7), transparent) 0 0 / 430px 430px,
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(118, 199, 255, .1), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 100% 100%, rgba(240, 160, 98, .08), transparent 70%),
+    var(--lav);
+  background-attachment: fixed;
+}
+
+/* Telemetry labels: Space Mono, uppercase, wide tracking, plasma blue. */
+:root .case[data-theme="cosmos"] :is(.hero .mono, .facts dt, .block h2, .versus b, .next .mono) {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--cs-plasma);
+}
+:root .case[data-theme="cosmos"] .hero .mono::before { content: "◇ "; color: var(--coral); }
+:root .case[data-theme="cosmos"] .hero h1 { font-family: var(--display); font-weight: 500; letter-spacing: -.04em; line-height: .95; }
+:root .case[data-theme="cosmos"] .hero .tagline { font-weight: 400; color: var(--slate); letter-spacing: -.01em; }
+
+:root .case[data-theme="cosmos"] .cover { border-radius: 2px; border: 1px solid var(--cs-line); }
+
+/* HUD panels: translucent, thin line, plasma corner brackets. */
+:root .case[data-theme="cosmos"] .facts,
+:root .case[data-theme="cosmos"] .block {
+  --cs-c: var(--cs-plasma);
+  padding: 20px 22px; border: 1px solid var(--cs-line); border-radius: 0;
+  background:
+    linear-gradient(var(--cs-c), var(--cs-c)) top left / 14px 1px no-repeat,
+    linear-gradient(var(--cs-c), var(--cs-c)) top left / 1px 14px no-repeat,
+    linear-gradient(var(--cs-c), var(--cs-c)) top right / 14px 1px no-repeat,
+    linear-gradient(var(--cs-c), var(--cs-c)) top right / 1px 14px no-repeat,
+    linear-gradient(var(--cs-c), var(--cs-c)) bottom left / 14px 1px no-repeat,
+    linear-gradient(var(--cs-c), var(--cs-c)) bottom left / 1px 14px no-repeat,
+    linear-gradient(var(--cs-c), var(--cs-c)) bottom right / 14px 1px no-repeat,
+    linear-gradient(var(--cs-c), var(--cs-c)) bottom right / 1px 14px no-repeat,
+    var(--cs-panel);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+:root .case[data-theme="cosmos"] .block + .block { margin-top: 16px; }
+:root .case[data-theme="cosmos"] .pair { margin-bottom: 16px; }
+:root .case[data-theme="cosmos"] .pair > .block { margin-top: 0; }
+:root .case[data-theme="cosmos"] .facts a { color: var(--coral); }
+:root .case[data-theme="cosmos"] .facts a:hover { color: #ff8a4c; }
+:root .case[data-theme="cosmos"] .cols li, :root .case[data-theme="cosmos"] .stack li,
+:root .case[data-theme="cosmos"] .versus, :root .case[data-theme="cosmos"] .decisions li { border-top: 1px solid var(--cs-line); }
+:root .case[data-theme="cosmos"] .decisions strong { font-family: var(--display); font-weight: 500; }
+/* Results: big readouts, coloured like the HUD's progress rail (plasma to ember). */
+:root .case[data-theme="cosmos"] .nums strong {
+  font-family: var(--mono); font-weight: 700; letter-spacing: -.04em;
+  background: linear-gradient(90deg, var(--cs-plasma), var(--coral)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+:root .case[data-theme="cosmos"] .nums span { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); }
+
+:root .case[data-theme="cosmos"] .next { background: transparent; color: var(--ink); border-top: 1px solid var(--cs-line); }
+:root .case[data-theme="cosmos"] .next strong { font-family: var(--display); font-weight: 500; letter-spacing: -.04em; }
+:root .case[data-theme="cosmos"] .next:hover strong { color: var(--coral); }
+
+/* Dock: outlined plasma squares (ember on hover), a translucent instrument pill. */
+:root .case[data-theme="cosmos"] .dock .round { border-radius: 2px; background: rgba(5, 7, 13, .7); color: var(--cs-plasma); border: 1px solid var(--cs-plasma); }
+:root .case[data-theme="cosmos"] .dock .round:hover { background: rgba(5, 7, 13, .7); color: var(--coral); border-color: var(--coral); }
+:root .case[data-theme="cosmos"] .dock .pill {
+  border-radius: 2px; background: rgba(9, 13, 22, .8); color: var(--ink); border: 1px solid var(--cs-line);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+:root .case[data-theme="cosmos"] .dock .pill span { font-family: var(--mono); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+:root .case[data-theme="cosmos"] .dock .pill button { border-radius: 2px; }
+:root .case[data-theme="cosmos"] .dock .pill button:hover { background: rgba(118, 199, 255, .14); color: var(--ink); }

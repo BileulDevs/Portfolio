@@ -1,4 +1,7 @@
 import type { MeshBasicMaterial, Object3D } from "@/components/carousel/threeParts";
+import type { BallKind, BlockKind, ItemKind, SpriteKind } from "./kinds";
+
+export type { BallKind, BlockKind, ItemKind, SpriteKind } from "./kinds";
 
 /**
  * Minecraft-style blocks drawn as 3D items (the feature carousel of the Minecraft case study).
@@ -8,7 +11,6 @@ import type { MeshBasicMaterial, Object3D } from "@/components/carousel/threePar
  * Textures are 16×16 pixel art generated here (seeded, so identical on every load), except the grass
  * side, which is the case study's own texture.
  */
-export type BlockKind = "grass" | "log" | "diamond" | "gold" | "emerald" | "redstone" | "lapis" | "iron" | "coal" | "spawner" | "command";
 export const BLOCK_KINDS: readonly BlockKind[] = ["grass", "log", "diamond", "gold", "emerald", "redstone", "lapis", "iron", "coal", "spawner", "command"];
 /** Fleck colours of each ore (stone with a few clusters of them). */
 const ORES: Partial<Record<BlockKind, { seed: number; colours: string[] }>> = {
@@ -215,11 +217,7 @@ async function createBlockMaterials() {
 // ---- Items: blocks, plus Cobblemon models ----------------------------------------------------------
 /** Models taken from Cobblemon (MPL-2.0, credited on the page), in public/projects/cobblemon-mods/cobblemon/. */
 export const COBBLEMON = "/projects/cobblemon-mods/cobblemon/";
-/** Balls: Cobblemon draws them all with the Poké Ball's model and animations, each with its texture. */
-export type BallKind = "poke_ball" | "safari_ball" | "beast_ball";
 export const BALL_KINDS: readonly BallKind[] = ["poke_ball", "safari_ball", "beast_ball"];
-/** Flat pixel-art items, extruded like Minecraft's held items (see `buildSprite`). */
-export type SpriteKind = "marks_ribbon" | "shiny_charm";
 /**
  * Each sprite's image and thickness, in its own pixels: Minecraft's 16-pixel items are 1 pixel thick,
  * so a 32-pixel image takes 2 to look the same.
@@ -235,7 +233,6 @@ const isSprite = (kind: ItemKind): kind is SpriteKind => kind in SPRITES;
 const SPRITE_ALPHA_TEST = 0.01;
 /** Shading of the sprite's faces, as for blocks: front and back lit, sides dimmer, underside darkest. */
 const SPRITE_SHADE = { face: 1, side: 0.8, top: 1, bottom: 0.5 };
-export type ItemKind = BlockKind | BallKind | SpriteKind;
 export const isBall = (kind: ItemKind): kind is BallKind => (BALL_KINDS as readonly string[]).includes(kind);
 /** The Poké Ball's height in pixels (8 + its outline), so it can be scaled to a block's size. */
 export const BALL_PX = 8.5;

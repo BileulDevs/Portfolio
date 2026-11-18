@@ -1,6 +1,9 @@
 import type { Group } from "@/components/carousel/threeParts";
 import { COBBLEMON } from "./blockItems";
 import type { BedrockModel } from "./bedrockModel";
+import type { Companion } from "./kinds";
+
+export type { Companion } from "./kinds";
 
 /**
  * Pokémon that can roam a feature's scene: Cobblemon's files for each, and a small behaviour that
@@ -8,7 +11,6 @@ import type { BedrockModel } from "./bedrockModel";
  * Sizes follow Cobblemon: 16 model pixels = 1 block, times the species' `baseScale`, all doubled
  * (SCENE_SCALE) so Pikachu, the first one, reads well beside its ball.
  */
-export type Companion = "pikachu" | "chansey" | "kangaskhan" | "tauros" | "poipole";
 
 export interface Species {
   /** Folder under public/projects/cobblemon-mods/cobblemon/, and file names inside it. */
