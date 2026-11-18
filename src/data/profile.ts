@@ -9,7 +9,6 @@ export const profile: ProfileData = {
   links: [
     { label: "GitHub", href: "https://github.com/BileulDevs", display: "github.com/BileulDevs" },
     { label: "CurseForge", href: "https://www.curseforge.com/members/darcosse/projects", display: "curseforge.com/members/darcosse" },
-    { label: "Noxtys", href: "https://noxtys.com/", display: "noxtys.com" },
   ],
 };
 

@@ -1,0 +1,21 @@
+poke_ball.geo.json, poke_ball.animation.json and poke_ball.png come unmodified from Cobblemon:
+https://gitlab.com/cable-mc/cobblemon (common/src/main/resources/assets/cobblemon/)
+They are distributed under the Mozilla Public License 2.0: https://mozilla.org/MPL/2.0/
+
+pikachu/ (pikachu_male.geo.json, pikachu.animation.json, pikachu.png) comes unmodified from the same repository
+(bedrock/pokemon/models|animations/0025_pikachu, textures/pokemon/0025_pikachu). Unlike the Poké Ball, these
+files carry their own licence, copied as pikachu/LICENSE.txt (Creative Commons Attribution-NonCommercial).
+Pikachu is a character owned by Nintendo, Game Freak and The Pokémon Company.
+
+chansey/, kangaskhan/, tauros/ (model, animations, texture, cry) and pikachu/pikachu_cry.ogg come unmodified
+from the same repository; each Pokémon folder carries its model licence as LICENSE.txt (Creative Commons
+Attribution-NonCommercial). safari_ball.png (textures/poke_balls) and sounds/poke_ball_send_out.ogg
+(sounds/poke_ball) come from it too. Chansey, Kangaskhan and Tauros are owned by Nintendo, Game Freak and
+The Pokémon Company.
+
+poipole/ (model, animations, texture) and beast_ball.png (textures/poke_balls) come unmodified from the same
+files, as shipped in the Cobblemon 1.8.4 mod; poipole/ carries its model licence as LICENSE.txt (Creative
+Commons Attribution-NonCommercial). Poipole is owned by Nintendo, Game Freak and The Pokémon Company.
+
+Exceptions: kangaskhan/kangaskhan_cry.ogg and poipole/poipole_cry.ogg come from PokeAPI
+(https://github.com/PokeAPI/cries, 115.ogg and 803.ogg), as Cobblemon's own files are silent placeholders.

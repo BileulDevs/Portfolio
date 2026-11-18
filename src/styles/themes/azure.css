@@ -20,24 +20,27 @@
 
 :root .case[data-theme="azure"] * { letter-spacing: 0; }
 
-/* Hero = portal page header: white bar, breadcrumb, semibold title. */
-:root .case[data-theme="azure"] .hero { background: #fff; border-bottom: 1px solid #edebe9; padding-bottom: 32px; }
+/* Hero = portal page header on the same grey canvas as the page: breadcrumb, semibold title. */
+:root .case[data-theme="azure"] .hero { padding-bottom: 0; }
 :root .case[data-theme="azure"] .hero .mono { color: var(--coral); text-transform: none; font-size: 14px; }
 :root .case[data-theme="azure"] .hero .mono::before { content: var(--crumb); /* translated, set by ProjectCase */ color: var(--slate); }
-:root .case[data-theme="azure"] .hero h1 { font-size: clamp(40px, 7vw, 96px); font-weight: 600; line-height: 1.05; }
-:root .case[data-theme="azure"] .hero .tagline { font-weight: 400; color: #323130; font-size: clamp(18px, 1.8vw, 24px); max-width: 48ch; }
+:root .case[data-theme="azure"] .hero h1 { font-size: clamp(36px, 5.5vw, 76px); font-weight: 600; line-height: 1.05; }
+:root .case[data-theme="azure"] .hero .tagline { font-weight: 400; color: #323130; font-size: clamp(17px, 1.5vw, 21px); max-width: 48ch; }
 
-:root .case[data-theme="azure"] .cover { margin-top: 32px; border-radius: 4px; box-shadow: var(--az-depth); }
+:root .case[data-theme="azure"] .showcase { margin-top: 32px; }
+:root .case[data-theme="azure"] .cover { border-radius: 4px; box-shadow: var(--az-depth); }
 
 /* Each block = a card. */
 :root .case[data-theme="azure"] .facts,
 :root .case[data-theme="azure"] .block { background: #fff; padding: 20px 24px; border-radius: 4px; box-shadow: var(--az-depth); }
 :root .case[data-theme="azure"] .block + .block { margin-top: 16px; }
+:root .case[data-theme="azure"] .pair { margin-bottom: 16px; }
+:root .case[data-theme="azure"] .pair > .block { margin-top: 0; }
 :root .case[data-theme="azure"] .facts dt,
 :root .case[data-theme="azure"] .block h2 { font-family: var(--display); text-transform: none; font-size: 14px; font-weight: 600; color: var(--ink); }
 :root .case[data-theme="azure"] .facts a { color: var(--coral); }
-:root .case[data-theme="azure"] .cols li,
-:root .case[data-theme="azure"] .versus { border-top: 1px solid #edebe9; font-size: 16px; }
+:root .case[data-theme="azure"] .cols li, :root .case[data-theme="azure"] .stack li,
+:root .case[data-theme="azure"] .versus { border-top: 1px solid #edebe9; font-size: 15px; }
 :root .case[data-theme="azure"] .versus b { font-family: var(--display); text-transform: none; font-size: 12px; font-weight: 600; }
 :root .case[data-theme="azure"] .nums strong { font-weight: 600; color: var(--coral); }
 

@@ -14,7 +14,7 @@ defineProps<{ project: Project; to: RouteLocationRaw; replace?: boolean }>();
 </template>
 
 <style scoped>
-.next { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 48px var(--pad); background: var(--base); color: var(--lav); text-decoration: none; }
-strong { font-size: clamp(36px, 6vw, 96px); font-weight: 800; letter-spacing: -.06em; transition: color .3s, transform .5s var(--ease); }
+.next { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 36px var(--pad); background: var(--base); color: var(--lav); text-decoration: none; }
+strong { font-size: clamp(30px, 4.5vw, 68px); font-weight: 800; letter-spacing: -.06em; transition: color .3s, transform .5s var(--ease); }
 .next:hover strong { color: var(--coral); transform: translateX(-10px); }
 </style>
