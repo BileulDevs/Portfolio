@@ -2,6 +2,11 @@
 /** Language-dependent <head>: lang, title, description, og:* (one URL per page, so no hreflang alternates). */
 const { t, locale, locales } = useI18n();
 const language = computed(() => locales.value.find((l) => l.code === locale.value)?.language ?? locale.value);
+const route = useRoute();
+/** Site address without its trailing slash; empty when unknown (see runtimeConfig in nuxt.config.ts). */
+const site = useRuntimeConfig().public.siteUrl.replace(/\/+$/, "");
+/** Share card: public/og.png, 1200 × 630. Absolute URLs only, so only when the site's address is known. */
+const OG_IMAGE = { path: "/og.png", width: "1200", height: "630", type: "image/png" };
 useHead(() => ({
   htmlAttrs: { lang: language.value },
   title: t("meta.title"),
@@ -10,6 +15,18 @@ useHead(() => ({
     { property: "og:title", content: t("meta.title") },
     { property: "og:description", content: t("meta.ogDescription") },
     { property: "og:locale", content: language.value.replace("-", "_") },
+    { name: "twitter:card", content: "summary_large_image" },
+    ...(site
+      ? [
+          { property: "og:url", content: site + route.path },
+          { property: "og:image", content: site + OG_IMAGE.path },
+          { property: "og:image:type", content: OG_IMAGE.type },
+          { property: "og:image:width", content: OG_IMAGE.width },
+          { property: "og:image:height", content: OG_IMAGE.height },
+          { property: "og:image:alt", content: t("meta.title") },
+          { name: "twitter:image", content: site + OG_IMAGE.path },
+        ]
+      : []),
   ],
 }));
 </script>
