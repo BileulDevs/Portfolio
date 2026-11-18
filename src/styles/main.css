@@ -51,9 +51,28 @@ code { font-family: var(--mono); font-size: .86em; }
 .big-title { margin: 0 0 clamp(28px, 4vw, 56px); font-size: clamp(48px, 8vw, 132px); font-weight: 700; letter-spacing: -.06em; line-height: .88; }
 .big-title em { font-weight: 200; font-style: italic; }
 
-/* The page behind the project modal must not scroll. */
 /* The page behind the project modal must not scroll (ProjectModal pads for the missing scrollbar). */
 .modal-open { overflow: hidden; }
+
+/*
+ * Scrollbars in the palette: a thin coral thumb (the site's accent, as for selection and focus) on a
+ * deeper slate track. scrollbar-color is inherited, so scrolling boxes (the project modal's window)
+ * get it too; each sets scrollbar-width itself. Browsers without scrollbar-color (Safari) read the
+ * ::-webkit-scrollbar rules instead; Chrome and Firefox ignore them once scrollbar-color is set.
+ */
+html { scrollbar-color: var(--coral) var(--base-2); scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--base-2); }
+::-webkit-scrollbar-thumb { background: var(--coral); border: 2px solid var(--base-2); border-radius: 999px; }
+
+/*
+ * Inside a project, its scrollbar takes the project's colours: `data-scroll` (its theme, or "site")
+ * is set on what scrolls, the page on /projects/… or the home modal's window. Each theme file has its
+ * rule; this one is for projects in the site's own look, on its lavender page.
+ */
+[data-scroll="site"] { scrollbar-color: var(--coral) var(--lav); }
+[data-scroll="site"]::-webkit-scrollbar-track { background: var(--lav); }
+[data-scroll="site"]::-webkit-scrollbar-thumb { background: var(--coral); border-color: var(--lav); }
 
 /* Reveal-on-scroll, driven by v-reveal. */
 .rv { opacity: 0; transform: translateY(40px); transition: opacity 1.1s var(--ease), transform 1.1s var(--ease); }

@@ -43,11 +43,12 @@
 
 :root .case[data-theme="noxtys"] .cover { border-radius: 10px; border: var(--nx-border); }
 
-/* Glass cards. */
+/* Glass cards: translucent surface and thin border. No backdrop-filter: over this near-uniform night
+   background a blur shows almost nothing, and redrawn while the home page's modal scales and clips
+   the case study in, it makes the cards flicker. */
 :root .case[data-theme="noxtys"] .facts,
 :root .case[data-theme="noxtys"] .block {
   background: var(--nx-surface); border: var(--nx-border); border-radius: 10px; padding: 18px 22px;
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
 }
 :root .case[data-theme="noxtys"] .block + .block { margin-top: 16px; }
 :root .case[data-theme="noxtys"] .pair { margin-bottom: 16px; }
@@ -75,3 +76,8 @@
 :root .case[data-theme="noxtys"] .dock .pill span { font-family: var(--display); }
 :root .case[data-theme="noxtys"] .dock .pill button { border-radius: 10px; }
 :root .case[data-theme="noxtys"] .dock .pill button:hover { background: rgba(139, 124, 246, .22); color: var(--ink); }
+
+/* The project's scrollbar (data-scroll, see main.css): the violet accent, on the page's own background. */
+[data-scroll="noxtys"] { scrollbar-color: #8b7cf6 #04060d; }
+[data-scroll="noxtys"]::-webkit-scrollbar-track { background: #04060d; }
+[data-scroll="noxtys"]::-webkit-scrollbar-thumb { background: #8b7cf6; border-color: #04060d; }
