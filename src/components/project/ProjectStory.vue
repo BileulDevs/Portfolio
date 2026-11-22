@@ -86,10 +86,11 @@ const featureItems = computed<FeatureItem[] | null>(() => {
 .decisions .num { padding-top: 3px; color: var(--coral); }
 .decisions strong { display: block; font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
 .decisions p { margin: 4px 0 0; max-width: 64ch; font-size: 14.5px; line-height: 1.55; opacity: .85; }
-.nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+/* One equal column per result, whatever their number (Space Journey has two). */
+.nums { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 16px; }
 .nums strong { display: block; font-size: clamp(38px, 4.2vw, 64px); font-weight: 800; letter-spacing: -.06em; line-height: .9; }
 .nums span { font-size: 14px; }
 .gallery { display: grid; gap: 16px; }
 .gallery img { width: 100%; border-radius: 8px; }
-@media (max-width: 900px) { .pair, .cols, .nums { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .pair, .cols, .nums { grid-template-columns: 1fr; } .nums { grid-auto-flow: row; } }
 </style>
