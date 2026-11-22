@@ -243,8 +243,8 @@ const en = {
       ],
       results: [
         { value: "Solo", label: "from architecture to production" },
-        { value: "5", label: "layers per module, always the same" },
-        { value: "1", label: "source of truth: the Zod schemas" },
+        { value: "Live", label: "in production on noxtys.com" },
+        { value: "10", label: "technologies handled end to end" },
       ],
     },
     observatory: {
@@ -304,8 +304,8 @@ const en = {
       ],
       results: [
         { value: "5", label: "real planetary systems" },
-        { value: "19", label: "GLSL shader modules" },
-        { value: "3", label: "GPU quality tiers" },
+        { value: "∞", label: "generated systems, each shareable by link" },
+        { value: "0", label: "frames drawn when nothing moves" },
       ],
     },
     "space-journey": {
@@ -364,8 +364,7 @@ const en = {
       ],
       results: [
         { value: "8", label: "chapters in one camera move" },
-        { value: "0", label: "image or audio files" },
-        { value: "1", label: "draw call for the asteroid field" },
+        { value: "3", label: "quality tiers, picked from the device" },
       ],
     },
     athlon: {
@@ -424,9 +423,9 @@ const en = {
         },
       ],
       results: [
+        { value: "50+", label: "applications moved to Azure" },
         { value: "÷2", label: "incident detection time" },
-        { value: "−25%", label: "infrastructure costs" },
-        { value: "99.9%", label: "availability" },
+        { value: "−80%", label: "daytime server load" },
       ],
     },
     "cobblemon-mods": {
@@ -525,8 +524,8 @@ const en = {
       ],
       results: [
         { value: "1.3M+", label: "total downloads" },
-        { value: "5", label: "Cobblemon mods maintained" },
-        { value: "2", label: "loaders: Fabric + NeoForge" },
+        { value: "7", label: "mods published" },
+        { value: "1", label: "codebase for Fabric and NeoForge" },
       ],
     },
   },
@@ -765,8 +764,8 @@ const fr: typeof en = {
       ],
       results: [
         { value: "Solo", label: "de l'architecture à la production" },
-        { value: "5", label: "couches par module, toujours les mêmes" },
-        { value: "1", label: "source de vérité : les schémas Zod" },
+        { value: "Live", label: "en production sur noxtys.com" },
+        { value: "10", label: "technologies maîtrisées de bout en bout" },
       ],
     },
     observatory: {
@@ -826,8 +825,8 @@ const fr: typeof en = {
       ],
       results: [
         { value: "5", label: "systèmes planétaires réels" },
-        { value: "19", label: "modules de shaders GLSL" },
-        { value: "3", label: "niveaux de qualité GPU" },
+        { value: "∞", label: "systèmes générés, chacun partageable par lien" },
+        { value: "0", label: "image calculée quand rien ne bouge" },
       ],
     },
     "space-journey": {
@@ -886,8 +885,7 @@ const fr: typeof en = {
       ],
       results: [
         { value: "8", label: "chapitres en un seul mouvement de caméra" },
-        { value: "0", label: "fichier image ou audio" },
-        { value: "1", label: "draw call pour le champ d'astéroïdes" },
+        { value: "3", label: "niveaux de qualité selon l'appareil" },
       ],
     },
     athlon: {
@@ -946,9 +944,9 @@ const fr: typeof en = {
         },
       ],
       results: [
+        { value: "50+", label: "applications migrées vers Azure" },
         { value: "÷2", label: "temps de détection des incidents" },
-        { value: "−25 %", label: "coûts d'infrastructure" },
-        { value: "99,9 %", label: "de disponibilité" },
+        { value: "−80 %", label: "de charge serveur en journée" },
       ],
     },
     "cobblemon-mods": {
@@ -1045,8 +1043,8 @@ const fr: typeof en = {
       ],
       results: [
         { value: "1,3M+", label: "téléchargements cumulés" },
-        { value: "5", label: "mods Cobblemon maintenus" },
-        { value: "2", label: "loaders : Fabric + NeoForge" },
+        { value: "7", label: "mods publiés" },
+        { value: "1", label: "seule base de code pour Fabric et NeoForge" },
       ],
     },
   },
